@@ -1,12 +1,10 @@
 <template>
   <header class="header">
-    <!-- Top banner -->
     <div v-if="topText" class="top-banner">
       <span>{{ topText.text }}</span>
       <RouterLink :to="topText.link" class="top-link">{{ t('more_details') }}</RouterLink>
     </div>
 
-    <!-- Second level navbar -->
     <nav class="second-nav">
       <div class="nav-left">
         <RouterLink to="/" class="logo">LOGO</RouterLink>
@@ -21,7 +19,6 @@
       </div>
 
       <div class="nav-right">
-        <!-- Language toggle -->
         <div class="lang-switcher" @click="toggleLang">
           <div :class="['switch', currentLang]">
             <span class="ua">UA</span>
@@ -35,7 +32,6 @@
       </div>
     </nav>
 
-    <!-- Third level navbar -->
     <nav class="third-nav">
       <div class="catalog" @mouseleave="hoveredCategory = null">
         <button @click="catalogOpen = !catalogOpen">
@@ -278,15 +274,14 @@ const categories = ref([
   box-shadow: 0 4px 12px rgba(0,0,0,0.12);
   border-radius: 6px;
   display: flex;
-  flex-direction: column; /* вертикально */
+  flex-direction: column;
   min-width: 170px;
   z-index: 20;
-  max-height: 350px; /* ставимо менше, щоб скрол точно з’явився */
-  overflow-y: auto;  /* вертикальний скрол */
-  padding-right: 4px; /* щоб скрол не накладався на текст */
+  max-height: 350px;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
-/* підсвітка при hover */
 .subcategory-menu a:hover {
   background: #e0e7ff;
   color: #1e40af;
@@ -305,7 +300,6 @@ const categories = ref([
 }
 .subcategory-menu a:hover { background: #e0e7ff; color: #1e40af; }
 
-/* скрол стилі для Chrome/Edge */
 .subcategory-menu.scrollable::-webkit-scrollbar {
   height: 6px;
 }
@@ -318,7 +312,6 @@ const categories = ref([
   border-radius: 3px;
 }
 
-/* скрол стилі для Firefox */
 .subcategory-menu.scrollable {
   scrollbar-width: thin;
   scrollbar-color: #1e40af #c7d2fe;
@@ -331,9 +324,9 @@ const categories = ref([
 }
 
 .third-nav .search-bar input {
-  width: 100%; /* займає всю ширину контейнера */
+  width: 100%;
   padding: 6px 12px;
-  padding-right: 100px; /* залишає місце під кнопку */
+  padding-right: 100px;
   font-size: 18px;
   font-weight: 700;
   border: 1px solid #d1d5db;
