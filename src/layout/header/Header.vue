@@ -7,7 +7,7 @@
 
     <nav class="second-nav">
       <div class="nav-left">
-        <RouterLink to="/" class="logo">LOGO</RouterLink>
+        <RouterLink to="/" class="logo">Cyberon</RouterLink>
       </div>
 
       <div class="nav-center">
