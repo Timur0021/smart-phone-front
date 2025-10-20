@@ -28,7 +28,17 @@
             </div>
           </div>
         </div>
-        <div class="phone">+380504741854</div>
+
+        <div class="phone" @click="togglePhonePopup">+380504741854</div>
+
+        <!-- Телефонний попап -->
+        <div v-if="showPhonePopup" class="phone-popup" @click.outside="showPhonePopup = false">
+          <div class="phone-popup-content">
+            <p>+380504741854</p>
+            <p>9:00-18:00; сб, нд — вихідні</p>
+            <button @click="contactUs">Зв'яжіться з нами</button>
+          </div>
+        </div>
       </div>
     </nav>
 
@@ -91,17 +101,7 @@ function toggleLang() {
 const catalogOpen = ref(false)
 const searchQuery = ref('')
 const showPopup = ref(false)
-
-function onSearch() {
-  console.log('Шукати:', searchQuery.value)
-}
-
-function hidePopup() {
-  setTimeout(() => showPopup.value = false, 150)
-}
-
 const hoveredCategory = ref<number | null>(null)
-
 const categories = ref([
   {
     id: 1, name: 'Телефони', link: '/phones', children: [
@@ -125,9 +125,25 @@ const categories = ref([
   { id: 3, name: 'Навушники', link: '/headphones' },
   { id: 4, name: 'Зарядне', link: '/chargers' },
 ])
+
+function onSearch() {
+  console.log('Шукати:', searchQuery.value)
+}
+
+function hidePopup() {
+  setTimeout(() => showPopup.value = false, 150)
+}
+
+const showPhonePopup = ref(false)
+function togglePhonePopup() {
+  showPhonePopup.value = !showPhonePopup.value
+}
+function contactUs() {
+  window.location.href = '/contacts'
+}
 </script>
 
-<style>
+<style lang="less" scoped>
 .header { font-family: 'Helvetica Neue', Arial, sans-serif; width: 100%; margin: 0; }
 
 .top-banner {
@@ -142,12 +158,7 @@ const categories = ref([
   font-weight: 700;
   line-height: 1.3;
 }
-.top-link {
-  color: #fff;
-  text-decoration: underline;
-  font-weight: 600;
-  font-size: 18px;
-}
+.top-link { color: #fff; text-decoration: underline; font-weight: 600; font-size: 18px; }
 .top-link:hover { color: #ffeb3b; }
 
 .second-nav {
@@ -168,9 +179,39 @@ const categories = ref([
 .nav-center { display: flex; gap: 50px; }
 .page-link { text-decoration: none; color: #1e40af; font-weight: 700; font-size: 20px; transition: color 0.2s; }
 .page-link:hover { color: #2563eb; }
-.nav-right { margin-left: auto; display: flex; align-items: center; gap: 40px; margin-right: 150px; }
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 40px; margin-right: 150px; position: relative; }
 .phone { font-size: 19px; cursor: pointer; padding: 10px 16px; border-radius: 6px; background: #c7d2fe; font-weight: 600; transition: all 0.2s; }
 .phone:hover { background: #a5b4fc; }
+
+/* Телефонний попап */
+.phone-popup {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  padding: 20px;
+  min-width: 250px;
+  z-index: 50;
+}
+.phone-popup-content p { margin: 0 0 10px 0; font-size: 18px; color: #1e40af; font-weight: 600; }
+.phone-popup-content button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 20px 75px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: block;
+  margin: 10px auto 0;
+  white-space: nowrap;
+}
+
+.phone-popup-content button:hover { background: #1e40af; }
 
 .lang-switcher { cursor: pointer; }
 .switch {
@@ -204,225 +245,59 @@ const categories = ref([
 .switch.EN span.ua { color: #1e40af; }
 .switch.EN span.en { color: #fff; }
 
-.third-nav {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 36px;
-  background: #fff;
-  padding: 16px 32px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-  font-size: 20px;
-  font-weight: 700;
-  position: relative;
-  border-top: 1px solid rgba(0,0,0,0.05);
-}
-
-.third-nav .catalog {
-  margin-left: 175px;
-  position: relative;
-}
-.third-nav .catalog button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #e0e7ff;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 24px;
-  color: #1e40af;
-  transition: all 0.2s;
-}
+/* Третя навігація */
+.third-nav { display: flex; justify-content: flex-start; align-items: center; gap: 36px; background: #fff; padding: 16px 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); font-size: 20px; font-weight: 700; position: relative; border-top: 1px solid rgba(0,0,0,0.05); }
+.third-nav .catalog { margin-left: 175px; position: relative; }
+.third-nav .catalog button { display: flex; align-items: center; gap: 8px; background: #e0e7ff; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 24px; color: #1e40af; transition: all 0.2s; }
 .third-nav .catalog button:hover { background: #c7d2fe; color: #1e40af; }
 .catalog-icon { width: 28px; height: 28px; }
 
-.catalog-menu {
-  position: absolute;
-  top: 130%;
-  left: 0;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-  border-radius: 6px;
-  display: flex;
-  flex-direction: column;
-  min-width: 170px;
-  z-index: 10;
-}
+.catalog-menu { position: absolute; top: 130%; left: 0; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.12); border-radius: 6px; display: flex; flex-direction: column; min-width: 170px; z-index: 10; }
 .category-item { position: relative; }
-.category-item > a {
-  padding: 10px 16px;
-  display: block;
-  text-decoration: none;
-  color: #1e40af;
-  font-weight: 700;
-  font-size: 18px;
-  transition: color 0.2s, background 0.2s;
-}
+.category-item > a { padding: 10px 16px; display: block; text-decoration: none; color: #1e40af; font-weight: 700; font-size: 18px; transition: color 0.2s, background 0.2s; }
 .category-item > a:hover { background: #e0e7ff; color: #1e40af; }
 
 .subcategory-menu {
-  position: absolute;
-  top: 0;
-  left: 100%;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-  border-radius: 6px;
-  display: flex;
-  flex-direction: column;
-  min-width: 170px;
-  z-index: 20;
-  max-height: 600px;
-  overflow-y: auto;
+  position: absolute; top: 0; left: 100%; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.12); border-radius: 6px;
+  display: flex; flex-direction: column; min-width: 170px; z-index: 20; max-height: 350px; overflow-y: auto; padding-right: 4px;
 }
-
-.subcategory-menu {
-  position: absolute;
-  top: 0;
-  left: 100%;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-  border-radius: 6px;
-  display: flex;
-  flex-direction: column;
-  min-width: 170px;
-  z-index: 20;
-  max-height: 350px;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.subcategory-menu a:hover {
-  background: #e0e7ff;
-  color: #1e40af;
-}
-.subcategory-menu.scrollable a:hover {
-  background: #1e40af;
-  color: #fff;
-}
-
-.subcategory-menu a {
-  padding: 10px 16px;
-  text-decoration: none;
-  color: #1e40af;
-  font-weight: 700;
-  font-size: 18px;
-}
+.subcategory-menu a { padding: 10px 16px; text-decoration: none; color: #1e40af; font-weight: 700; font-size: 18px; }
 .subcategory-menu a:hover { background: #e0e7ff; color: #1e40af; }
+.subcategory-menu.scrollable a:hover { background: #1e40af; color: #fff; }
 
-.subcategory-menu.scrollable::-webkit-scrollbar {
-  height: 6px;
-}
-.subcategory-menu.scrollable::-webkit-scrollbar-track {
-  background: #c7d2fe;
-  border-radius: 3px;
-}
-.subcategory-menu.scrollable::-webkit-scrollbar-thumb {
-  background: #1e40af;
-  border-radius: 3px;
-}
+.subcategory-menu.scrollable::-webkit-scrollbar { width: 6px; }
+.subcategory-menu.scrollable::-webkit-scrollbar-track { background: #c7d2fe; border-radius: 3px; }
+.subcategory-menu.scrollable::-webkit-scrollbar-thumb { background: #1e40af; border-radius: 3px; }
+.subcategory-menu.scrollable { scrollbar-width: thin; scrollbar-color: #1e40af #c7d2fe; }
 
-.subcategory-menu.scrollable {
-  scrollbar-width: thin;
-  scrollbar-color: #1e40af #c7d2fe;
-}
-
-.third-nav .search-bar {
-  position: relative;
-  margin-left: 40px;
-  width: 65rem;
-}
-
-.third-nav .search-bar input {
-  width: 100%;
-  padding: 6px 12px;
-  padding-right: 100px;
-  font-size: 18px;
-  font-weight: 700;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  color: #1e40af;
-  box-sizing: border-box;
-  height: 44px;
-}
-
-.third-nav .search-bar button {
-  position: absolute;
-  top: 0;
-  right: 0;
-  height: 100%;
-  border: none;
-  background: #2563eb;
-  color: #fff;
-  border-radius: 0 8px 8px 0;
-  padding: 0 16px;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 18px;
-  line-height: 44px;
-  transition: background 0.2s;
-}
+.third-nav .search-bar { position: relative; margin-left: 40px; width: 65rem; }
+.third-nav .search-bar input { width: 100%; padding: 6px 12px; padding-right: 100px; font-size: 18px; font-weight: 700; border: 1px solid #d1d5db; border-radius: 8px; color: #1e40af; box-sizing: border-box; height: 44px; }
+.third-nav .search-bar button { position: absolute; top: 0; right: 0; height: 100%; border: none; background: #2563eb; color: #fff; border-radius: 0 8px 8px 0; padding: 0 16px; cursor: pointer; font-weight: 700; font-size: 18px; line-height: 44px; transition: background 0.2s; }
 .third-nav .search-bar button:hover { background: #1e40af; }
 
+.search-popup { position: absolute; top: 110%; left: 0; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); padding: 24px 24px 20px; width: 95%; z-index: 30; }
+.search-popup .popup-title { color: #6b7280; font-weight: 700; font-size: 30px; margin-bottom: 20px; }
+.search-popup .popup-item { color: #000; font-size: 20px; margin-bottom: 25px; cursor: pointer; }
+.search-popup .popup-item:hover { color: #2563eb; }
 
-.third-nav .user-icons {
-  display: flex;
-  gap: 12px;
-}
-.third-nav .user-icons button {
-  background: #e0e7ff;
-  border: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 20px;
-  font-weight: 700;
-  color: #1e40af;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: background 0.2s;
-}
+.third-nav .user-icons { display: flex; gap: 12px; }
+.third-nav .user-icons button { background: #e0e7ff; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 20px; font-weight: 700; color: #1e40af; display: flex; justify-content: center; align-items: center; transition: background 0.2s; }
+.third-nav .user-icons button:hover { background: #c7d2fe; }
 
-.third-nav .user-icons button:hover {
-  background: #c7d2fe;
-}
+@media (min-width: 2560px) {
+  .nav-left { margin-left: 350px; }
+  .nav-right { margin-right: 300px; }
 
-.search-bar {
-  position: relative;
-}
+  .third-nav .catalog { margin-left: 350px; }
 
-.search-popup {
-  position: absolute;
-  top: 110%;
-  left: 0;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  padding: 24px 24px 20px;
-  width: 95%;
-  z-index: 30;
-}
+  .third-nav .search-bar {
+    width: 85rem;
+    margin-left: 35px;
+  }
 
-.search-popup .popup-title {
-  color: #6b7280;
-  font-weight: 700;
-  font-size: 30px;
-  margin-bottom: 20px;
-}
-
-.search-popup .popup-item {
-  color: #000;
-  font-size: 20px;
-  margin-bottom: 25px;
-  cursor: pointer;
-}
-
-.search-popup .popup-item:hover {
-  color: #2563eb;
+  .search-popup {
+    width: 95%;
+    padding: 32px 32px 28px;
+  }
 }
 </style>
-
