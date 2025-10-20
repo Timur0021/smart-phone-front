@@ -57,8 +57,14 @@
       </div>
 
       <div class="search-bar">
-        <input type="text" v-model="searchQuery" placeholder="Пошук..." />
+        <input type="text" v-model="searchQuery" placeholder="Пошук..." @focus="showPopup = true" @blur="hidePopup" />
         <button @click="onSearch">Знайти</button>
+
+        <div v-if="showPopup" class="search-popup">
+          <div class="popup-title">Часто шукають</div>
+          <div class="popup-item">Телефон</div>
+          <div class="popup-item">Планшет</div>
+        </div>
       </div>
 
       <div class="user-icons">
@@ -84,8 +90,14 @@ function toggleLang() {
 
 const catalogOpen = ref(false)
 const searchQuery = ref('')
+const showPopup = ref(false)
+
 function onSearch() {
   console.log('Шукати:', searchQuery.value)
+}
+
+function hidePopup() {
+  setTimeout(() => showPopup.value = false, 150)
 }
 
 const hoveredCategory = ref<number | null>(null)
@@ -377,6 +389,40 @@ const categories = ref([
 
 .third-nav .user-icons button:hover {
   background: #c7d2fe;
+}
+
+.search-bar {
+  position: relative;
+}
+
+.search-popup {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  padding: 24px 24px 20px;
+  width: 95%;
+  z-index: 30;
+}
+
+.search-popup .popup-title {
+  color: #6b7280;
+  font-weight: 700;
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.search-popup .popup-item {
+  color: #000;
+  font-size: 20px;
+  margin-bottom: 25px;
+  cursor: pointer;
+}
+
+.search-popup .popup-item:hover {
+  color: #2563eb;
 }
 </style>
 
