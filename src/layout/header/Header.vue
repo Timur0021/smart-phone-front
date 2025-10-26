@@ -31,12 +31,23 @@
 
         <div class="phone" @click="togglePhonePopup">+380504741854</div>
 
-        <!-- Телефонний попап -->
-        <div v-if="showPhonePopup" class="phone-popup" @click.outside="showPhonePopup = false">
+        <div v-if="showPhonePopup" class="phone-popup" @click.self="showPhonePopup = false">
           <div class="phone-popup-content">
             <p>+380504741854</p>
             <p>9:00-18:00; сб, нд — вихідні</p>
-            <button @click="contactUs">Зв'яжіться з нами</button>
+            <button @click="openContactPopup">Зв'яжіться з нами</button>
+          </div>
+        </div>
+
+        <div v-if="showContactPopup" class="contact-popup" @click.self="closeContactPopup">
+          <div class="contact-popup-content">
+            <button class="close-popup" @click="closeContactPopup">×</button>
+            <h2>Зворотній зв'язок</h2>
+            <input type="text" v-model="contactPhone" placeholder="Ваш номер телефону" />
+            <button @click="orderCall">Замовити дзвінок</button>
+            <p class="contact-info">
+              Натискаючи на кнопку, я погоджуюся з політикою конфіденційності цього сайту.
+            </p>
           </div>
         </div>
       </div>
@@ -96,6 +107,26 @@ const t = (key: string) => key
 const currentLang = ref<'UA' | 'EN'>('UA')
 function toggleLang() {
   currentLang.value = currentLang.value === 'UA' ? 'EN' : 'UA'
+}
+
+const showContactPopup = ref(false)
+function openContactPopup() {
+  showContactPopup.value = true
+}
+
+function closeContactPopup() {
+  showContactPopup.value = false
+}
+
+const contactPhone = ref('')
+
+function orderCall() {
+  if (!contactPhone.value) {
+    alert('Введіть номер телефону')
+    return
+  }
+  console.log('Замовлено дзвінок на:', contactPhone.value)
+  showContactPopup.value = false
 }
 
 const catalogOpen = ref(false)
@@ -299,5 +330,89 @@ function contactUs() {
     width: 95%;
     padding: 32px 32px 28px;
   }
+}
+.contact-popup {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+.contact-popup-content {
+  background: #fff;
+  border-radius: 16px;
+  padding: 64px;
+  width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  text-align: center;
+  position: relative;
+}
+
+.contact-popup-content h2 {
+  font-size: 48px;
+  font-weight: 700;
+  color: #1e40af;
+  margin-bottom: 32px;
+}
+
+.contact-popup-content input {
+  padding: 28px;
+  font-size: 32px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+}
+
+.contact-popup-content button {
+  padding: 28px;
+  font-size: 32px;
+  font-weight: 700;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.contact-popup-content button:hover { background: #1e40af; }
+
+.contact-info {
+  font-size: 24px;
+  color: #6b7280;
+}
+.contact-popup-content .close-popup {
+  position: absolute;
+  top: 20px;
+  right: 46px;
+  background: transparent !important;
+  border: none;
+  font-size: 45px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0;
+  width: auto;
+  height: auto;
+  line-height: 1;
+}
+
+.contact-popup-content .close-popup:hover {
+  color: #374151;
+}
+.close-popup {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 36px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #6b7280;
+  transition: color 0.2s;
 }
 </style>
