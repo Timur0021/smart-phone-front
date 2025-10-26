@@ -380,9 +380,11 @@ function contactUs() {
 
 .contact-popup-content button:hover { background: #1e40af; }
 
-.contact-info {
-  font-size: 24px;
+.contact-popup-content .contact-info {
+  font-size: 18px;
   color: #6b7280;
+  margin: 12px 0 0 0;
+  text-align: center;
 }
 .contact-popup-content .close-popup {
   position: absolute;
