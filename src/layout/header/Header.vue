@@ -277,7 +277,7 @@ function contactUs() {
 .switch.EN span.en { color: #fff; }
 
 /* Третя навігація */
-.third-nav { display: flex; justify-content: flex-start; align-items: center; gap: 36px; background: #fff; padding: 16px 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); font-size: 20px; font-weight: 700; position: relative; border-top: 1px solid rgba(0,0,0,0.05); }
+.third-nav { display: flex; justify-content: flex-start; align-items: center; gap: 36px; background: #fff; padding: 16px 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); font-size: 20px; font-weight: 700; position: relative; border-top: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05); }
 .third-nav .catalog { margin-left: 175px; position: relative; }
 .third-nav .catalog button { display: flex; align-items: center; gap: 8px; background: #e0e7ff; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 24px; color: #1e40af; transition: all 0.2s; }
 .third-nav .catalog button:hover { background: #c7d2fe; color: #1e40af; }
