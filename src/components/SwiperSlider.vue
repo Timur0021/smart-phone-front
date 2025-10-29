@@ -45,4 +45,30 @@ import { Autoplay, Navigation, Pagination } from 'swiper/modules'
   object-fit: cover;
   border-radius: 0;
 }
+::v-deep(.swiper-pagination) {
+  background-color: rgba(47, 47, 47, 0.5);
+  padding: 0.5rem 0;
+  border-radius: 16px;
+  bottom: 10px !important;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  max-width: 200px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+::v-deep(.swiper-pagination .swiper-pagination-bullet) {
+  background-color: white;
+  opacity: 1;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+::v-deep(.swiper-pagination .swiper-pagination-bullet-active) {
+  transform: scale(1.3);
+}
 </style>
