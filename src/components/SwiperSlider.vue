@@ -41,19 +41,20 @@ import { Autoplay, Navigation, Pagination } from 'swiper/modules'
 
 .swiper-container img {
   width: 100%;
-  height: 500px;
+  height: 600px;
   object-fit: cover;
-  border-radius: 0;
-}
-::v-deep(.swiper-pagination) {
-  background-color: rgba(47, 47, 47, 0.5);
-  padding: 0.5rem 0;
   border-radius: 16px;
-  bottom: 10px !important;
+}
+
+::v-deep(.swiper-pagination) {
+  background-color: rgba(47, 47, 47, 0.6);
+  padding: 0.7rem 0.8rem;
+  border-radius: 20px;
+  bottom: 20px !important;
   display: flex;
   justify-content: center;
-  gap: 0.5rem;
-  max-width: 200px;
+  gap: 0.8rem;
+  max-width: 250px;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -62,13 +63,24 @@ import { Autoplay, Navigation, Pagination } from 'swiper/modules'
 ::v-deep(.swiper-pagination .swiper-pagination-bullet) {
   background-color: white;
   opacity: 1;
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  transition: transform 0.3s;
+  transition: transform 0.3s, background-color 0.3s;
 }
 
 ::v-deep(.swiper-pagination .swiper-pagination-bullet-active) {
-  transform: scale(1.3);
+  transform: scale(1.6);
+  background-color: #0040ff;
+}
+
+@media (min-width: 2560px) {
+  .swiper-container {
+    margin: 2rem auto 0;
+    width: 130rem;
+    max-width: 98%;
+    border-radius: 16px;
+    overflow: hidden;
+  }
 }
 </style>
