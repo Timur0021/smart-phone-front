@@ -33,7 +33,7 @@ import { Autoplay, Navigation, Pagination } from 'swiper/modules'
 <style scoped>
 .swiper-container {
   margin: 2rem auto 0;
-  width: 100rem;
+  width: 95rem;
   max-width: 98%;
   border-radius: 16px;
   overflow: hidden;
@@ -77,7 +77,7 @@ import { Autoplay, Navigation, Pagination } from 'swiper/modules'
 @media (min-width: 2560px) {
   .swiper-container {
     margin: 2rem auto 0;
-    width: 130rem;
+    width: 113rem;
     max-width: 98%;
     border-radius: 16px;
     overflow: hidden;

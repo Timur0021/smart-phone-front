@@ -2,7 +2,7 @@
   <header class="header">
     <div v-if="topText" class="top-banner">
       <span>{{ topText.text }}</span>
-      <RouterLink :to="topText.link" class="top-link">{{ t('more_details') }}</RouterLink>
+      <RouterLink :to="topText.link" @click="redirectToLink" class="top-link">{{ t('more_details') }}</RouterLink>
     </div>
 
     <nav class="second-nav">
@@ -98,15 +98,66 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
-
-const topText = ref({ text: 'Безкоштовна доставка при замовленні від 1000₴', link: '/delivery' })
-const t = (key: string) => key
+import { onMounted, ref, watch as vueWatch } from 'vue'
+import { RouterLink, useRouter } from 'vue-router'
+import { apolloClient} from "@/graphql/apolloClient.ts";
+import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
 
 const currentLang = ref<'UA' | 'EN'>('UA')
+const topText = ref<{ text: string, link: string } | null>(null);
+const t = (key: string) => key
+const router = useRouter()
+
+async function loadSettings() {
+  try {
+    const { data } = await apolloClient.query({
+      query: GET_SETTINGS,
+      context: {
+        headers: {
+          'Next-locale': currentLang.value.toLowerCase()
+        }
+      },
+      fetchPolicy: 'no-cache'
+    })
+    const textData = data?.settings?.text_in_site?.[0]
+
+    if (textData) {
+      topText.value = {
+        text: textData.text,
+        link: textData.link || '#',
+      }
+    }
+  } catch (error) {
+    console.error('GraphQL error:', error)
+  }
+}
+
+onMounted(() => {
+  const savedLang = localStorage.getItem('siteLang') as 'UA' | 'EN' | null
+  if (savedLang) currentLang.value = savedLang
+  loadSettings()
+})
+
+vueWatch(currentLang, () => {
+  loadSettings()
+})
+
+function redirectToLink() {
+  if (topText.value?.link) {
+    window.location.href = topText.value.link;
+  }
+}
+
 function toggleLang() {
   currentLang.value = currentLang.value === 'UA' ? 'EN' : 'UA'
+  localStorage.setItem('siteLang', currentLang.value)
+
+  const path =
+      currentLang.value === 'EN'
+          ? `/en${router.currentRoute.value.fullPath.replace(/^\/en/, '')}`
+          : router.currentRoute.value.fullPath.replace(/^\/en/, '')
+
+  router.push(path)
 }
 
 const showContactPopup = ref(false)
