@@ -266,6 +266,6 @@ function contactUs() {
 }
 </script>
 
-<style lang="less" scoped>
-@import "./css/HeaderStyles.less";
+<style lang="css" scoped>
+@import "css/HeaderStyles.css";
 </style>
