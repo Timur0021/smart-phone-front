@@ -102,20 +102,96 @@
 /* Третя навігація */
 .third-nav { display: flex; justify-content: flex-start; align-items: center; gap: 36px; background: #fff; padding: 16px 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); font-size: 20px; font-weight: 700; position: relative; border-top: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05); }
 .third-nav .catalog { margin-left: 175px; position: relative; }
-.third-nav .catalog button { display: flex; align-items: center; gap: 8px; background: #e0e7ff; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 24px; color: #1e40af; transition: all 0.2s; }
-.third-nav .catalog button:hover { background: #c7d2fe; color: #1e40af; }
-.catalog-icon { width: 28px; height: 28px; }
+.third-nav .catalog button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #e0e7ff;
+    border: none;
+    padding: 16px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 26px;
+    color: #1e40af;
+    transition: all 0.2s;
+    min-width: 250px;
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
 
-.catalog-menu { position: absolute; top: 130%; left: 0; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.12); border-radius: 6px; display: flex; flex-direction: column; min-width: 170px; z-index: 10; }
+.third-nav .catalog button:hover {
+    background: #c7d2fe;
+    color: #1e40af;
+}
+.catalog-icon {
+    width: 60px;
+    height: 40px;
+}
+.catalog-menu {
+    position: absolute;
+    top: 130%; left: 0;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    min-width: 250px;
+    z-index: 10;
+}
 .category-item { position: relative; }
-.category-item > a { padding: 10px 16px; display: block; text-decoration: none; color: #1e40af; font-weight: 700; font-size: 18px; transition: color 0.2s, background 0.2s; }
-.category-item > a:hover { background: #e0e7ff; color: #1e40af; }
+.category-item > a {
+    padding: 20px 16px;
+    display: block;
+    text-decoration: none;
+    color: #1e40af;
+    font-weight: 700;
+    font-size: 24px;
+    transition: color 0.2s, background 0.2s;
+}
+
+.category-item > a:hover {
+    background: #1e40af;
+    color: #ffffff;
+}
+.category-link.disabled-link {
+    pointer-events: none;
+    opacity: 0.6;
+    cursor: default;
+}
+
+.soon-label {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: #f59e0b;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
 
 .subcategory-menu {
-  position: absolute; top: 0; left: 100%; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.12); border-radius: 6px;
-  display: flex; flex-direction: column; min-width: 170px; z-index: 20; max-height: 350px; overflow-y: auto; padding-right: 4px;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    min-width: 250px;
+    width: 250px;
+    z-index: 20;
+    max-height: 350px;
+    overflow-y: auto;
+    padding-right: 4px;
 }
-.subcategory-menu a { padding: 10px 16px; text-decoration: none; color: #1e40af; font-weight: 700; font-size: 18px; }
+.subcategory-menu a { padding: 20px 16px; text-decoration: none; color: #1e40af; font-weight: 700; font-size: 24px; }
 .subcategory-menu a:hover { background: #e0e7ff; color: #1e40af; }
 .subcategory-menu.scrollable a:hover { background: #1e40af; color: #fff; }
 

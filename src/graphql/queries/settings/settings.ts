@@ -30,10 +30,12 @@ export const GET_SETTINGS = gql`
               id
               name
               slug
+              will_be_soon
               children {
                 id
                 name
                 slug
+                will_be_soon
               }
           }
         }

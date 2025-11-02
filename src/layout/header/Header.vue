@@ -76,8 +76,11 @@
           <div v-for="category in categories" :key="category.id" class="category-item"
                @mouseenter="hoveredCategory = Number(category.id)">
             <RouterLink
-                :to="category.link">
+                :to="category.will_be_soon ? '#' : category.link"
+                :class="['category-link', { 'disabled-link': category.will_be_soon }]"
+            >
               {{ category.name }}
+              <span v-if="category.will_be_soon" class="soon-label">Скоро</span>
             </RouterLink>
 
             <div
@@ -124,9 +127,9 @@ import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
 
 const currentLang = ref<'UA' | 'EN'>('UA')
 
-const sidebarPages = ref<{ id: string; title: string; slug: string }[]>([])
+const sidebarPages = ref<{ id: string; title: string; slug: string }[]>([]);
 const textInSite = ref<{ text: string; link: string; is_new_window?: boolean }[]>([]);
-const categories = ref<{ id: string; name: string; link: string; children?: any[] }[]>([])
+const categories = ref<{ id: string; name: string; link: string; children?: any[]; will_be_soon?: boolean }[]>([]);
 const settings = ref<{ name: string; key: string; value: string; is_new_window?: boolean }[]>([]);
 
 const firstText = computed(() => textInSite.value?.[0] || null)
@@ -186,6 +189,7 @@ async function loadSettings() {
         id: cat.id,
         name: cat.name,
         link: `/${cat.slug}`,
+        will_be_soon: cat.will_be_soon || false,
         children: (cat.children || []).map((child: any) => ({
           id: child.id,
           name: child.name,
