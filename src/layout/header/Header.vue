@@ -109,6 +109,37 @@ import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
 const currentLang = ref<'UA' | 'EN'>('UA')
 const topText = ref<{ text: string, link: string } | null>(null);
 const sidebarPages = ref<{ id: string; title: string; slug: string }[]>([])
+const catalogOpen = ref(false)
+const searchQuery = ref('')
+const showPopup = ref(false)
+const hoveredCategory = ref<number | null>(null)
+const categories = ref([
+  {
+    id: 1, name: 'Телефони', link: '/phones', children: [
+      {id: 11, name: 'Samsung', link: '/phones/samsung'},
+      {id: 12, name: 'Apple', link: '/phones/apple'},
+      {id: 13, name: 'Xiaomi', link: '/phones/xiaomi'},
+      {id: 14, name: 'Huawei', link: '/phones/huawei'},
+      {id: 15, name: 'Realme', link: '/phones/realme'},
+      {id: 16, name: 'Oppo', link: '/phones/oppo'},
+      {id: 17, name: 'Vivo', link: '/phones/vivo'},
+      {id: 18, name: 'OnePlus', link: '/phones/oneplus'},
+      {id: 19, name: 'Nokia', link: '/phones/nokia'},
+      {id: 20, name: 'Sony', link: '/phones/sony'},
+    ]
+  },
+  { id: 2, name: 'Планшети', link: '/tablets', children: [
+      { id: 21, name: 'Samsung', link: '/tablets/samsung' },
+      { id: 22, name: 'Apple', link: '/tablets/apple' },
+    ]
+  },
+  { id: 3, name: 'Навушники', link: '/headphones' },
+  { id: 4, name: 'Зарядне', link: '/chargers' },
+])
+const showContactPopup = ref(false)
+const contactPhone = ref('')
+const showPhonePopup = ref(false)
+
 const t = (key: string) => key
 const router = useRouter()
 
@@ -169,7 +200,6 @@ function toggleLang() {
   router.push(path)
 }
 
-const showContactPopup = ref(false)
 function openContactPopup() {
   showContactPopup.value = true
 }
@@ -178,7 +208,6 @@ function closeContactPopup() {
   showContactPopup.value = false
 }
 
-const contactPhone = ref('')
 
 function orderCall() {
   if (!contactPhone.value) {
@@ -189,34 +218,6 @@ function orderCall() {
   showContactPopup.value = false
 }
 
-const catalogOpen = ref(false)
-const searchQuery = ref('')
-const showPopup = ref(false)
-const hoveredCategory = ref<number | null>(null)
-const categories = ref([
-  {
-    id: 1, name: 'Телефони', link: '/phones', children: [
-      {id: 11, name: 'Samsung', link: '/phones/samsung'},
-      {id: 12, name: 'Apple', link: '/phones/apple'},
-      {id: 13, name: 'Xiaomi', link: '/phones/xiaomi'},
-      {id: 14, name: 'Huawei', link: '/phones/huawei'},
-      {id: 15, name: 'Realme', link: '/phones/realme'},
-      {id: 16, name: 'Oppo', link: '/phones/oppo'},
-      {id: 17, name: 'Vivo', link: '/phones/vivo'},
-      {id: 18, name: 'OnePlus', link: '/phones/oneplus'},
-      {id: 19, name: 'Nokia', link: '/phones/nokia'},
-      {id: 20, name: 'Sony', link: '/phones/sony'},
-    ]
-  },
-  { id: 2, name: 'Планшети', link: '/tablets', children: [
-      { id: 21, name: 'Samsung', link: '/tablets/samsung' },
-      { id: 22, name: 'Apple', link: '/tablets/apple' },
-    ]
-  },
-  { id: 3, name: 'Навушники', link: '/headphones' },
-  { id: 4, name: 'Зарядне', link: '/chargers' },
-])
-
 function onSearch() {
   console.log('Шукати:', searchQuery.value)
 }
@@ -225,10 +226,10 @@ function hidePopup() {
   setTimeout(() => showPopup.value = false, 150)
 }
 
-const showPhonePopup = ref(false)
 function togglePhonePopup() {
   showPhonePopup.value = !showPhonePopup.value
 }
+
 function contactUs() {
   window.location.href = '/contacts'
 }
