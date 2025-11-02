@@ -68,13 +68,20 @@
         <div v-if="catalogOpen" class="catalog-menu">
           <div v-for="category in categories" :key="category.id" class="category-item"
                @mouseenter="hoveredCategory = Number(category.id)">
-            <RouterLink :to="category.link">{{ category.name }}</RouterLink>
+            <RouterLink
+                :to="category.link">
+              {{ category.name }}
+            </RouterLink>
 
             <div
                 v-if="hoveredCategory === Number(category.id) && category.children?.length"
                 :class="['subcategory-menu', { scrollable: category.children.length > 7 }]"
             >
-              <RouterLink v-for="sub in category.children" :key="sub.id" :to="sub.link">
+              <RouterLink
+                  v-for="sub in category.children"
+                  :key="sub.id"
+                  :to="sub.link"
+              >
                 {{ sub.name }}
               </RouterLink>
             </div>
