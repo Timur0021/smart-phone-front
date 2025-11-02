@@ -44,7 +44,7 @@
         <div v-if="showPhonePopup" class="phone-popup" @click.self="showPhonePopup = false">
           <div class="phone-popup-content">
             <p>+380504741854</p>
-            <p>9:00-18:00; сб, нд — вихідні</p>
+            <p v-if="workOurs">{{ workOurs.text }}</p>
             <button @click="openContactPopup">Зв'яжіться з нами</button>
           </div>
         </div>
@@ -123,14 +123,20 @@ import { apolloClient} from "@/graphql/apolloClient.ts";
 import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
 
 const currentLang = ref<'UA' | 'EN'>('UA')
-const topText = ref<{ text: string; link: string; is_new_window?: boolean }[]>([]);
-const firstText = computed(() => topText.value?.[0] || null)
+
 const sidebarPages = ref<{ id: string; title: string; slug: string }[]>([])
+const topText = ref<{ text: string; link: string; is_new_window?: boolean }[]>([]);
+
+const firstText = computed(() => topText.value?.[0] || null)
+const workOurs = computed(() => topText.value?.[1] || null)
+
 const catalogOpen = ref(false)
 const searchQuery = ref('')
+
 const showPopup = ref(false)
 const hoveredCategory = ref<number | null>(null)
 const categories = ref<{ id: string; name: string; link: string; children?: any[] }[]>([])
+
 const showContactPopup = ref(false)
 const contactPhone = ref('')
 const showPhonePopup = ref(false)
