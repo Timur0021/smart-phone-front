@@ -23,11 +23,6 @@ export const GET_SETTINGS = gql`
               id
               name
               slug
-              parent {
-                id
-                name
-                slug
-              }
               children {
                 id
                 name

@@ -67,14 +67,16 @@
 
         <div v-if="catalogOpen" class="catalog-menu">
           <div v-for="category in categories" :key="category.id" class="category-item"
-               @mouseenter="hoveredCategory = category.id">
+               @mouseenter="hoveredCategory = Number(category.id)">
             <RouterLink :to="category.link">{{ category.name }}</RouterLink>
 
             <div
-                v-if="hoveredCategory === category.id && category.children?.length"
+                v-if="hoveredCategory === Number(category.id) && category.children?.length"
                 :class="['subcategory-menu', { scrollable: category.children.length > 7 }]"
             >
-              <RouterLink v-for="sub in category.children" :key="sub.id" :to="sub.link">{{ sub.name }}</RouterLink>
+              <RouterLink v-for="sub in category.children" :key="sub.id" :to="sub.link">
+                {{ sub.name }}
+              </RouterLink>
             </div>
           </div>
         </div>
@@ -113,29 +115,7 @@ const catalogOpen = ref(false)
 const searchQuery = ref('')
 const showPopup = ref(false)
 const hoveredCategory = ref<number | null>(null)
-const categories = ref([
-  {
-    id: 1, name: 'Телефони', link: '/phones', children: [
-      {id: 11, name: 'Samsung', link: '/phones/samsung'},
-      {id: 12, name: 'Apple', link: '/phones/apple'},
-      {id: 13, name: 'Xiaomi', link: '/phones/xiaomi'},
-      {id: 14, name: 'Huawei', link: '/phones/huawei'},
-      {id: 15, name: 'Realme', link: '/phones/realme'},
-      {id: 16, name: 'Oppo', link: '/phones/oppo'},
-      {id: 17, name: 'Vivo', link: '/phones/vivo'},
-      {id: 18, name: 'OnePlus', link: '/phones/oneplus'},
-      {id: 19, name: 'Nokia', link: '/phones/nokia'},
-      {id: 20, name: 'Sony', link: '/phones/sony'},
-    ]
-  },
-  { id: 2, name: 'Планшети', link: '/tablets', children: [
-      { id: 21, name: 'Samsung', link: '/tablets/samsung' },
-      { id: 22, name: 'Apple', link: '/tablets/apple' },
-    ]
-  },
-  { id: 3, name: 'Навушники', link: '/headphones' },
-  { id: 4, name: 'Зарядне', link: '/chargers' },
-])
+const categories = ref<{ id: string; name: string; link: string; children?: any[] }[]>([])
 const showContactPopup = ref(false)
 const contactPhone = ref('')
 const showPhonePopup = ref(false)
@@ -156,6 +136,7 @@ async function loadSettings() {
     })
     const textData = data?.settings?.text_in_site?.[0]
     const sidebarData = data?.settings?.sidebars?.[0]
+    const catalogData = data?.settings?.product_categories || []
 
     if (textData) {
       topText.value = {
@@ -172,6 +153,21 @@ async function loadSettings() {
       }))
     } else {
       sidebarPages.value = []
+    }
+
+    if (catalogData) {
+      categories.value = (catalogData || []).map((cat: any) => ({
+        id: cat.id,
+        name: cat.name,
+        link: `/${cat.slug}`,
+        children: (cat.children || []).map((child: any) => ({
+          id: child.id,
+          name: child.name,
+          link: `/${cat.slug}/${child.slug}`
+        }))
+      }))
+    } else {
+      categories.value = []
     }
   } catch (error) {
     console.error('GraphQL error:', error)
