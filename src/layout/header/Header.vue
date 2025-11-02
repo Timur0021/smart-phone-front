@@ -39,11 +39,11 @@
           </div>
         </div>
 
-        <div class="phone" @click="togglePhonePopup">+380504741854</div>
+        <div v-if="phone" class="phone" @click="togglePhonePopup">{{ phone.value }}</div>
 
         <div v-if="showPhonePopup" class="phone-popup" @click.self="showPhonePopup = false">
           <div class="phone-popup-content">
-            <p>+380504741854</p>
+            <p v-if="phone">{{ phone.value }}</p>
             <p v-if="workOurs">{{ workOurs.text }}</p>
             <button @click="openContactPopup">Зв'яжіться з нами</button>
           </div>
@@ -125,17 +125,19 @@ import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
 const currentLang = ref<'UA' | 'EN'>('UA')
 
 const sidebarPages = ref<{ id: string; title: string; slug: string }[]>([])
-const topText = ref<{ text: string; link: string; is_new_window?: boolean }[]>([]);
+const textInSite = ref<{ text: string; link: string; is_new_window?: boolean }[]>([]);
+const categories = ref<{ id: string; name: string; link: string; children?: any[] }[]>([])
+const settings = ref<{ name: string; key: string; value: string; is_new_window?: boolean }[]>([]);
 
-const firstText = computed(() => topText.value?.[0] || null)
-const workOurs = computed(() => topText.value?.[1] || null)
+const firstText = computed(() => textInSite.value?.[0] || null)
+const workOurs = computed(() => textInSite.value?.[1] || null)
+const phone = computed(() => settings.value?.[0] || null)
 
 const catalogOpen = ref(false)
 const searchQuery = ref('')
 
 const showPopup = ref(false)
 const hoveredCategory = ref<number | null>(null)
-const categories = ref<{ id: string; name: string; link: string; children?: any[] }[]>([])
 
 const showContactPopup = ref(false)
 const contactPhone = ref('')
@@ -155,20 +157,22 @@ async function loadSettings() {
       },
       fetchPolicy: 'no-cache'
     })
-    const textData = data?.settings?.text_in_site || []
-    const sidebarData = data?.settings?.sidebars?.[0]
-    const catalogData = data?.settings?.product_categories || []
 
-    if (textData.length) {
-      topText.value = textData.map((t: any) => ({
+    const textInSiteData = data?.settings?.text_in_site || []
+    const sidebarsData = data?.settings?.sidebars?.[0]
+    const categoriesData = data?.settings?.product_categories || []
+    const settingsData = data?.settings?.settings || []
+
+    if (textInSiteData.length) {
+      textInSite.value = textInSiteData.map((t: any) => ({
         text: t.text,
         link: t.link || '#',
         is_new_window: t.is_new_window || false,
       }))
     }
 
-    if (sidebarData && sidebarData.pages?.length) {
-      sidebarPages.value = sidebarData.pages.map((p: any) => ({
+    if (sidebarsData && sidebarsData.pages?.length) {
+      sidebarPages.value = sidebarsData.pages.map((p: any) => ({
         id: p.id,
         title: p.title,
         slug: p.slug,
@@ -177,8 +181,8 @@ async function loadSettings() {
       sidebarPages.value = []
     }
 
-    if (catalogData) {
-      categories.value = (catalogData || []).map((cat: any) => ({
+    if (categoriesData) {
+      categories.value = (categoriesData || []).map((cat: any) => ({
         id: cat.id,
         name: cat.name,
         link: `/${cat.slug}`,
@@ -190,6 +194,15 @@ async function loadSettings() {
       }))
     } else {
       categories.value = []
+    }
+
+    if (settingsData.length) {
+      settings.value = settingsData.map((s: any) => ({
+        name: s.name,
+        key: s.key,
+        value: s.value,
+        is_new_window: s.is_new_window || false,
+      }))
     }
   } catch (error) {
     console.error('GraphQL error:', error)
