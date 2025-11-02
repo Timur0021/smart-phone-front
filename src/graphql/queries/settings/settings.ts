@@ -3,6 +3,13 @@ import { gql } from '@apollo/client/core';
 export const GET_SETTINGS = gql`
     query MyQuery {
         settings {
+          settings {
+            name
+            key
+            value
+            to_front
+            is_new_window
+          }
           sidebars {
             name
             slug

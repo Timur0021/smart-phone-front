@@ -1,8 +1,15 @@
 <template>
   <header class="header">
-    <div v-if="topText" class="top-banner">
-      <span>{{ topText.text }}</span>
-      <a :href="topText.link" class="top-link">{{ t('more_details') }}</a>
+    <div v-if="firstText" class="top-banner">
+      <span>{{ firstText.text }}</span>
+      <a
+          :href="firstText.link"
+          class="top-link"
+          :target="firstText.is_new_window ? '_blank' : '_self'"
+          :rel="firstText.is_new_window ? 'noopener noreferrer' : undefined"
+      >
+        {{ t('more_details') }}
+      </a>
     </div>
 
     <nav class="second-nav">
@@ -110,13 +117,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch as vueWatch } from 'vue'
+import { onMounted, ref, watch as vueWatch, computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { apolloClient} from "@/graphql/apolloClient.ts";
 import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
 
 const currentLang = ref<'UA' | 'EN'>('UA')
-const topText = ref<{ text: string, link: string } | null>(null);
+const topText = ref<{ text: string; link: string; is_new_window?: boolean }[]>([]);
+const firstText = computed(() => topText.value?.[0] || null)
 const sidebarPages = ref<{ id: string; title: string; slug: string }[]>([])
 const catalogOpen = ref(false)
 const searchQuery = ref('')
@@ -141,15 +149,16 @@ async function loadSettings() {
       },
       fetchPolicy: 'no-cache'
     })
-    const textData = data?.settings?.text_in_site?.[0]
+    const textData = data?.settings?.text_in_site || []
     const sidebarData = data?.settings?.sidebars?.[0]
     const catalogData = data?.settings?.product_categories || []
 
-    if (textData) {
-      topText.value = {
-        text: textData.text,
-        link: textData.link || '#',
-      }
+    if (textData.length) {
+      topText.value = textData.map((t: any) => ({
+        text: t.text,
+        link: t.link || '#',
+        is_new_window: t.is_new_window || false,
+      }))
     }
 
     if (sidebarData && sidebarData.pages?.length) {
