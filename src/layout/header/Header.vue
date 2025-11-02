@@ -2,7 +2,7 @@
   <header class="header">
     <div v-if="topText" class="top-banner">
       <span>{{ topText.text }}</span>
-      <RouterLink :to="topText.link" @click="redirectToLink" class="top-link">{{ t('more_details') }}</RouterLink>
+      <a :href="topText.link" class="top-link">{{ t('more_details') }}</a>
     </div>
 
     <nav class="second-nav">
@@ -11,11 +11,14 @@
       </div>
 
       <div class="nav-center">
-        <RouterLink to="/promotions/" class="page-link">Акції</RouterLink>
-        <RouterLink to="/delivery/" class="page-link">Оплата та доставка</RouterLink>
-        <RouterLink to="/blog/" class="page-link">Блог</RouterLink>
-        <RouterLink to="/contacts/" class="page-link">Контакти</RouterLink>
-        <RouterLink to="/brands/" class="page-link">Бренди</RouterLink>
+        <RouterLink
+            v-for="page in sidebarPages"
+            :key="page.id"
+            to="/promotions/"
+            class="page-link"
+        >
+          {{ page.title }}
+        </RouterLink>
       </div>
 
       <div class="nav-right">
@@ -105,6 +108,7 @@ import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
 
 const currentLang = ref<'UA' | 'EN'>('UA')
 const topText = ref<{ text: string, link: string } | null>(null);
+const sidebarPages = ref<{ id: string; title: string; slug: string }[]>([])
 const t = (key: string) => key
 const router = useRouter()
 
@@ -120,12 +124,23 @@ async function loadSettings() {
       fetchPolicy: 'no-cache'
     })
     const textData = data?.settings?.text_in_site?.[0]
+    const sidebarData = data?.settings?.sidebars?.[0]
 
     if (textData) {
       topText.value = {
         text: textData.text,
         link: textData.link || '#',
       }
+    }
+
+    if (sidebarData && sidebarData.pages?.length) {
+      sidebarPages.value = sidebarData.pages.map((p: any) => ({
+        id: p.id,
+        title: p.title,
+        slug: p.slug,
+      }))
+    } else {
+      sidebarPages.value = []
     }
   } catch (error) {
     console.error('GraphQL error:', error)
@@ -141,12 +156,6 @@ onMounted(() => {
 vueWatch(currentLang, () => {
   loadSettings()
 })
-
-function redirectToLink() {
-  if (topText.value?.link) {
-    window.location.href = topText.value.link;
-  }
-}
 
 function toggleLang() {
   currentLang.value = currentLang.value === 'UA' ? 'EN' : 'UA'
@@ -241,7 +250,7 @@ function contactUs() {
   line-height: 1.3;
 }
 .top-link { color: #fff; text-decoration: underline; font-weight: 600; font-size: 18px; }
-.top-link:hover { color: #ffeb3b; }
+.top-link:hover { color: #ffffff; }
 
 .second-nav {
   display: flex;
