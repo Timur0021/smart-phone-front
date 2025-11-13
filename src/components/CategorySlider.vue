@@ -1,13 +1,8 @@
 <template>
   <div class="category-slider">
-<!--    <div class="nav-card prev" @click="slidePrev" :class="{ disabled: currentIndex === 0 }">-->
-<!--      Назад-->
-<!--    </div>-->
-    <!-- Кнопка Назад -->
     <div class="nav-card prev" @click="slidePrev" :class="{ disabled: currentIndex === 0 }">
       <span class="arrow"></span>
     </div>
-
 
     <Swiper
         @swiper="onSwiperInit"
@@ -28,9 +23,6 @@
     <div class="nav-card next" @click="slideNext" :class="{ disabled: currentIndex >= categories.length - 4 }">
       <span class="arrow"></span>
     </div>
-<!--    <div class="nav-card next" @click="slideNext" :class="{ disabled: currentIndex >= categories.length - 4 }">-->
-<!--      Далі-->
-<!--    </div>-->
   </div>
 </template>
 
