@@ -1,8 +1,13 @@
 <template>
   <div class="category-slider">
+<!--    <div class="nav-card prev" @click="slidePrev" :class="{ disabled: currentIndex === 0 }">-->
+<!--      Назад-->
+<!--    </div>-->
+    <!-- Кнопка Назад -->
     <div class="nav-card prev" @click="slidePrev" :class="{ disabled: currentIndex === 0 }">
-      Назад
+      <span class="arrow"></span>
     </div>
+
 
     <Swiper
         @swiper="onSwiperInit"
@@ -21,8 +26,11 @@
     </Swiper>
 
     <div class="nav-card next" @click="slideNext" :class="{ disabled: currentIndex >= categories.length - 4 }">
-      Далі
+      <span class="arrow"></span>
     </div>
+<!--    <div class="nav-card next" @click="slideNext" :class="{ disabled: currentIndex >= categories.length - 4 }">-->
+<!--      Далі-->
+<!--    </div>-->
   </div>
 </template>
 
@@ -106,7 +114,7 @@ function slidePrev() {
 }
 
 .nav-card {
-  background: #f0f0f0;
+  background: #1e40af;
   font-weight: 700;
   color: #555;
   border-radius: 14px;
@@ -125,7 +133,25 @@ function slidePrev() {
 }
 
 .nav-card:hover:not(.disabled) {
-  background: #dcdcdc;
+  background: #2563eb;
+}
+
+.arrow {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-top: 4px solid white;
+  border-right: 4px solid white;
+  transform: rotate(45deg);
+  transition: transform 0.3s;
+}
+
+.nav-card.prev .arrow {
+  transform: rotate(-135deg);
+}
+
+.nav-card.next .arrow {
+  transform: rotate(45deg);
 }
 @media (min-width: 2560px) {
   .category-slider {
