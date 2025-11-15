@@ -1,6 +1,7 @@
 <template>
   <div class="swiper-container">
     <Swiper
+        :key="banners.length"
         :modules="[Autoplay, Navigation, Pagination]"
         :slides-per-view="1"
         :loop="true"
@@ -9,14 +10,8 @@
         :navigation="false"
         class="mySwiper"
     >
-      <SwiperSlide>
-        <img src="../assets/1.jpg" alt="Slide 1" />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src="../assets/2.jpg" alt="Slide 2" />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src="../assets/3.jpg" alt="Slide 3" />
+      <SwiperSlide v-for="(banner, index) in banners" :key="index">
+        <img :src="banner.image" alt="Slide 1" />
       </SwiperSlide>
     </Swiper>
   </div>
@@ -28,6 +23,10 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import { Autoplay, Navigation, Pagination } from 'swiper/modules'
+
+const props = defineProps<{
+  banners: Array<{ image: string; imageMobile?: string }>,
+}>()
 </script>
 
 <style scoped>

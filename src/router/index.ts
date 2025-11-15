@@ -3,13 +3,10 @@ import HomeView from '../views/HomeView.vue'
 
 const routes = [
     {
-        path: '/',
+        path: '/:lang(en)?',
         name: 'home',
         component: HomeView,
-    },
-    {
-        path: '/en',
-        component: HomeView
+        props: true
     },
     {
         path: '/about',
