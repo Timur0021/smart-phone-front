@@ -131,8 +131,6 @@ import { apolloClient} from "@/graphql/apolloClient.ts";
 import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
 import { CREATE_REQUEST } from "@/graphql/mutations/request/request.ts";
 import { useToast } from "vue-toastification";
-import intlTelInput from 'intl-tel-input'
-import 'intl-tel-input/build/css/intlTelInput.css'
 
 const toast = useToast();
 const currentLang = ref<'UA' | 'EN'>('UA')
