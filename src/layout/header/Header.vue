@@ -53,7 +53,12 @@
           <div class="contact-popup-content">
             <button class="close-popup" @click="closeContactPopup">×</button>
             <h2>Зворотній зв'язок</h2>
-            <input type="text" v-model="contactPhone" placeholder="Ваш номер телефону" />
+            <input
+                type="tel"
+                v-model="contactPhone"
+                @input="formatPhone"
+                placeholder="+380XXXXXXXXX"
+            />
             <button @click="orderCall">Замовити дзвінок</button>
             <p class="contact-info">
               Натискаючи на кнопку, я погоджуюся з політикою конфіденційності цього сайту.
@@ -124,7 +129,12 @@ import { onMounted, ref, watch as vueWatch, computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { apolloClient} from "@/graphql/apolloClient.ts";
 import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
+import { CREATE_REQUEST } from "@/graphql/mutations/request/request.ts";
+import { useToast } from "vue-toastification";
+import intlTelInput from 'intl-tel-input'
+import 'intl-tel-input/build/css/intlTelInput.css'
 
+const toast = useToast();
 const currentLang = ref<'UA' | 'EN'>('UA')
 
 const sidebarPages = ref<{ id: string; title: string; slug: string }[]>([]);
@@ -140,11 +150,23 @@ const catalogOpen = ref(false)
 const searchQuery = ref('')
 
 const showPopup = ref(false)
+const showPhonePopup = ref(false)
+
 const hoveredCategory = ref<number | null>(null)
 
 const showContactPopup = ref(false)
 const contactPhone = ref('')
-const showPhonePopup = ref(false)
+
+function openContactPopup() {
+  showContactPopup.value = true
+}
+
+function closeContactPopup() {
+  showContactPopup.value = false
+}
+
+const contactPhoneInput = ref<HTMLInputElement | null>(null)
+let iti: ReturnType<typeof intlTelInput> | null = null
 
 const t = (key: string) => key
 const router = useRouter()
@@ -235,22 +257,64 @@ function toggleLang() {
   router.push(path)
 }
 
-function openContactPopup() {
-  showContactPopup.value = true
+interface CreateRequestResponse {
+  createRequest: {
+    message: string
+    status: string
+  }
 }
 
-function closeContactPopup() {
-  showContactPopup.value = false
-}
-
-
-function orderCall() {
+async function orderCall() {
   if (!contactPhone.value) {
-    alert('Введіть номер телефону')
+    toast.error('Введіть номер телефону')
     return
   }
-  console.log('Замовлено дзвінок на:', contactPhone.value)
-  showContactPopup.value = false
+
+  if (!isValidPhone(contactPhone.value)) {
+    toast.error('Невірний формат номера телефону')
+    return
+  }
+
+  try {
+    const result = await apolloClient.mutate<CreateRequestResponse>({
+      mutation: CREATE_REQUEST,
+      variables: { phone: contactPhone.value }
+    })
+
+    const data = result.data
+    if (data?.createRequest?.status === 'Успіх') {
+      toast.success(data.createRequest.message)
+    } else {
+      toast.error(data?.createRequest?.message || 'Сталася помилка')
+    }
+
+    showContactPopup.value = false
+    contactPhone.value = ''
+  } catch (error) {
+    console.error(error)
+    toast.error('Сталася помилка при замовленні дзвінка')
+  }
+}
+
+function formatPhone(e: Event) {
+  let value = (e.target as HTMLInputElement).value
+
+  value = value.replace(/[^\d+]/g, '')
+
+  if (value.startsWith('+')) {
+    value = '+' + value.slice(1).replace(/\+/g, '')
+  } else {
+    value = value.replace(/\+/g, '')
+  }
+
+  value = value.slice(0, 15)
+
+  contactPhone.value = value
+}
+
+function isValidPhone(phone: string): boolean {
+  const uaPattern = /^(\+380\d{9}|0\d{9})$/
+  return uaPattern.test(phone)
 }
 
 function onSearch() {
