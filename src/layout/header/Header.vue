@@ -165,9 +165,6 @@ function closeContactPopup() {
   showContactPopup.value = false
 }
 
-const contactPhoneInput = ref<HTMLInputElement | null>(null)
-let iti: ReturnType<typeof intlTelInput> | null = null
-
 const t = (key: string) => key
 const router = useRouter()
 
