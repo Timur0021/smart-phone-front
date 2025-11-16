@@ -37,7 +37,15 @@
           </label>
         </div>
 
-        <button type="submit" class="btn">Зареєструватися</button>
+        <button type="submit" class="btn main-btn">Зареєструватися</button>
+
+        <button type="button" class="btn google-btn" @click="signInWithGoogle">
+          Зареєструватися через Google
+        </button>
+
+        <p class="login-text">
+          Вже є обліковий запис? <a href="/login">увійти</a>
+        </p>
       </form>
     </div>
   </div>
@@ -78,6 +86,10 @@ const pageStyle = computed<CSSProperties>(() => ({
 
 const submit = () => {
   console.log(form)
+}
+
+const signInWithGoogle = () => {
+  console.log("Google Sign-In clicked")
 }
 
 onMounted(() => {
@@ -209,7 +221,7 @@ html, body {
   left: 7px;
   width: 6px;
   height: 12px;
-  border: solid #ffffff;
+  border: solid #0010ff;
   border-width: 0 4px 4px 0;
   transform: rotate(45deg) scale(0);
   opacity: 0;
@@ -236,32 +248,60 @@ html, body {
 }
 
 .checkbox-group a:hover {
-  color: #ffdd57;
+  color: #4285f4;
 }
 
 .btn {
-  width: 100%;
-  background: linear-gradient(135deg, #5a78ff, #6a8aff);
-  color: white;
-  padding: 16px 0;
-  border: none;
+  width: 85%;
+  max-width: 500px;
+  padding: 14px 0;
   border-radius: 14px;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   cursor: pointer;
   letter-spacing: 0.3px;
+  display: block;
+  margin: 0 auto 20px;
   transition: 0.25s ease;
+}
+
+.main-btn {
+  background: linear-gradient(135deg, #5a78ff, #6a8aff);
+  color: white;
   box-shadow: 0 6px 20px rgba(70, 100, 255, 0.3);
 }
 
-.btn:hover {
+.main-btn:hover {
   background: linear-gradient(135deg, #4d6cff, #607dff);
   transform: translateY(-2px);
   box-shadow: 0 10px 26px rgba(70, 100, 255, 0.35);
 }
 
-.btn:active {
-  transform: translateY(1px);
-  box-shadow: 0 3px 14px rgba(70, 100, 255, 0.22);
+.google-btn {
+  background: #fff;
+  color: #4285f4;
+  font-weight: 700;
+  border: 1px solid #4285f4;
+}
+
+.google-btn:hover {
+  background: #f0f0f0;
+}
+
+.login-text {
+  text-align: center;
+  color: #fff;
+  font-size: 16px;
+}
+
+.login-text a {
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: underline;
+  margin-left: 5px;
+}
+
+.login-text a:hover {
+  color: #4285f4;
 }
 </style>
