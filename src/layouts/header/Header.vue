@@ -116,7 +116,9 @@
       </div>
 
       <div class="user-icons">
-        <button>👤</button>
+        <button>
+          <router-link :to="{name: 'dashboard'}">👤</router-link>
+        </button>
         <button>❤️</button>
         <button>🛒</button>
       </div>

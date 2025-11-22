@@ -5,7 +5,7 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import Header from './layout/header/Header.vue';
+import Header from '../src/layouts/header/Header.vue';
 import {computed} from "vue";
 
 const route = useRoute();
