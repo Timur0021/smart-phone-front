@@ -5,16 +5,6 @@
 
       <form @submit.prevent="submit" class="form">
         <div class="form-group">
-          <input v-model="form.firstName" type="text" required placeholder=" " />
-          <label>Ім’я</label>
-        </div>
-
-        <div class="form-group">
-          <input v-model="form.lastName" type="text" required placeholder=" " />
-          <label>Прізвище</label>
-        </div>
-
-        <div class="form-group">
           <input v-model="form.email" type="email" required placeholder=" " />
           <label>Email</label>
         </div>
@@ -24,27 +14,17 @@
           <label>Пароль</label>
         </div>
 
-        <div class="form-group">
-          <input v-model="form.password_confirmation" type="password" required placeholder=" " />
-          <label>Підтвердження пароля</label>
-        </div>
-
         <div class="checkbox-group">
           <input v-model="form.acceptPolicy" type="checkbox" id="policy" required />
           <label for="policy">
-            Погоджуюсь з
-            <a href="/privacy-policy" target="_blank">політикою конфіденційності</a>
+            Запамятати мене
           </label>
         </div>
 
-        <button type="submit" class="btn main-btn">Зареєструватися</button>
-
-        <button type="button" class="btn google-btn" @click="signInWithGoogle">
-          Зареєструватися через Google
-        </button>
+        <button type="submit" class="btn main-btn">Увійти</button>
 
         <p class="login-text">
-          Вже є обліковий запис? <router-link :to="{name: 'login'}">увійти</router-link>
+          Ще не маєте облікового запису? <router-link :to="{name: 'register'}">Зареєструватись</router-link>
         </p>
       </form>
     </div>
@@ -237,6 +217,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 6px;
+  font-size: 20px;
   cursor: pointer;
 }
 
@@ -275,17 +256,6 @@ html, body {
   background: linear-gradient(135deg, #4d6cff, #607dff);
   transform: translateY(-2px);
   box-shadow: 0 10px 26px rgba(70, 100, 255, 0.35);
-}
-
-.google-btn {
-  background: #fff;
-  color: #4285f4;
-  font-weight: 700;
-  border: 1px solid #4285f4;
-}
-
-.google-btn:hover {
-  background: #f0f0f0;
 }
 
 .login-text {
