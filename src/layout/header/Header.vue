@@ -127,7 +127,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch as vueWatch, computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
-import { apolloClient} from "@/graphql/apolloClient.ts";
+import { apolloClient } from "@/graphql/apolloClient.ts";
 import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
 import { CREATE_REQUEST } from "@/graphql/mutations/request/request.ts";
 import { useToast } from "vue-toastification";

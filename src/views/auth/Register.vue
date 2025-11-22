@@ -5,18 +5,23 @@
 
       <form @submit.prevent="submit" class="form">
         <div class="form-group">
-          <input v-model="form.firstName" type="text" required placeholder=" " />
+          <input v-model="form.name" type="text" required placeholder=" " />
           <label>Ім’я</label>
         </div>
 
         <div class="form-group">
-          <input v-model="form.lastName" type="text" required placeholder=" " />
+          <input v-model="form.last_name" type="text" required placeholder=" " />
           <label>Прізвище</label>
         </div>
 
         <div class="form-group">
           <input v-model="form.email" type="email" required placeholder=" " />
           <label>Email</label>
+        </div>
+
+        <div class="form-group">
+          <input v-model="form.phone" type="tel" required placeholder=" " @input="formatPhone"/>
+          <label>Телефон</label>
         </div>
 
         <div class="form-group">
@@ -30,7 +35,7 @@
         </div>
 
         <div class="checkbox-group">
-          <input v-model="form.acceptPolicy" type="checkbox" id="policy" required />
+          <input v-model="form.i_agree" type="checkbox" id="policy" />
           <label for="policy">
             Погоджуюсь з
             <a href="/privacy-policy" target="_blank">політикою конфіденційності</a>
@@ -54,14 +59,23 @@
 <script setup lang="ts">
 import { reactive, ref, computed, onMounted } from 'vue'
 import type { CSSProperties } from 'vue'
+import { apolloClient } from "@/graphql/apolloClient.ts";
+import { REGISTER } from "@/graphql/mutations/auth/register.ts";
+import { useToast } from "vue-toastification";
+import { useRouter, useRoute } from 'vue-router';
+
+const toast = useToast();
+const router = useRouter();
+const route = useRoute();
 
 const form = reactive({
-  firstName: '',
-  lastName: '',
+  name: '',
+  last_name: '',
   email: '',
+  phone: '',
   password: '',
   password_confirmation: '',
-  acceptPolicy: false,
+  i_agree: false,
 })
 
 const backgrounds = [
@@ -84,8 +98,54 @@ const pageStyle = computed<CSSProperties>(() => ({
   transition: 'background 1s ease-in-out'
 }))
 
-const submit = () => {
-  console.log(form)
+const submit = async () => {
+  if (!form.i_agree) {
+    toast.error("Ви повинні погодитися з політикою конфіденційності");
+    return;
+  }
+
+  const phoneRegex = /^(\+380|0)\d{9}$/;
+  if (!phoneRegex.test(form.phone)) {
+    toast.error("Невірний формат телефону.");
+    return;
+  }
+
+  if (form.password !== form.password_confirmation) {
+    toast.error("Паролі не збігаються.");
+    return;
+  }
+
+  try {
+    const { data } = await apolloClient.mutate({
+      mutation: REGISTER,
+      variables: {
+        input: {
+          name: form.name,
+          last_name: form.last_name,
+          email: form.email,
+          phone: form.phone,
+          password: form.password,
+          password_confirmation: form.password_confirmation,
+          i_agree: form.i_agree,
+        }
+      }
+    });
+
+    if (data?.register?.token) {
+        toast.success("Реєстрація успішна!");
+        localStorage.setItem("token", data.register.token);
+
+        await router.push({
+          name: 'home',
+          params: { lang: route.params.lang === 'en' ? 'en' : undefined }
+        });
+    } else {
+      toast.error("Щось пішло не так, спробуйте ще раз.")
+    }
+  } catch (error: any) {
+    console.log(error);
+    toast.error(error.message || "Помилка реєстрації");
+  }
 }
 
 const signInWithGoogle = () => {
@@ -97,6 +157,22 @@ onMounted(() => {
     currentBg.value = (currentBg.value + 1) % backgrounds.length
   }, 5000)
 })
+
+function formatPhone(e: Event) {
+  let value = (e.target as HTMLInputElement).value;
+
+  value = value.replace(/[^\d+]/g, '');
+
+  if (value.startsWith('+')) {
+    value = '+' + value.slice(1).replace(/\+/g, '');
+  } else {
+    value = value.replace(/\+/g, '');
+  }
+
+  value = value.slice(0, 15);
+
+  form.phone = value;
+}
 </script>
 
 <style>
