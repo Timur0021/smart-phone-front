@@ -23,7 +23,7 @@
           </a>
         </li>
         <li class="menu-item">
-          <a href="#" class="menu-link logout">
+          <a href="#" class="menu-link logout" @click.prevent="handleLogout">
             <span class="icon">🚪</span>
             Вихід
           </a>
@@ -31,14 +31,11 @@
       </ul>
     </nav>
 
-    <!-- Контент -->
     <div class="content">
-      <!-- Breadcrumb -->
       <div class="breadcrumb">
         <span>Головна</span>
         <span>{{ breadcrumbLabel }}</span>
       </div>
-
       <slot></slot>
     </div>
   </div>
@@ -46,8 +43,15 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { apolloClient } from "@/graphql/apolloClient.ts";
+import { LOGOUT } from "@/graphql/mutations/auth/logout.ts";
+import { useToast } from "vue-toastification";
+import  { useRoute, useRouter } from "vue-router";
 
 const activeItem = ref('profile');
+const toast = useToast();
+const router = useRouter();
+const route = useRoute();
 
 const breadcrumbLabel = computed(() => {
   switch (activeItem.value) {
@@ -57,6 +61,28 @@ const breadcrumbLabel = computed(() => {
     default: return '';
   }
 });
+
+const handleLogout = async () => {
+  try {
+    await apolloClient.mutate({
+      mutation: LOGOUT,
+    });
+  } catch (error) {
+    console.warn("Logout request failed (expected if token expired):", error);
+  }
+
+  localStorage.removeItem('token');
+  sessionStorage.removeItem('token');
+
+  await apolloClient.clearStore();
+
+  toast.success("Ви успішно вийшли з акаунту");
+
+  await router.push({
+    name: 'home',
+    params: { lang: route.params.lang === 'en' ? 'en' : undefined }
+  });
+}
 </script>
 
 <style scoped>

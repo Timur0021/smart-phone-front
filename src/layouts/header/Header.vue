@@ -116,11 +116,14 @@
       </div>
 
       <div class="user-icons">
-        <button>
-          <router-link :to="{name: 'dashboard'}">
-            <i class="fa-solid fa-user"  style="color: #000000;"></i>
-          </router-link>
+        <button @click="goToDashboard">
+          <i class="fa-solid fa-user" style="color: #000000;"></i>
         </button>
+<!--        <button>-->
+<!--          <router-link :to="{name: 'dashboard'}">-->
+<!--            <i class="fa-solid fa-user"  style="color: #000000;"></i>-->
+<!--          </router-link>-->
+<!--        </button>-->
         <button>❤️</button>
         <button>🛒</button>
       </div>
@@ -254,6 +257,18 @@ function toggleLang() {
           : router.currentRoute.value.fullPath.replace(/^\/en/, '')
 
   router.push(path)
+}
+
+function goToDashboard() {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    toast.error("Спочатку увійдіть у свій акаунт");
+    router.push({ name: 'login' });
+    return;
+  }
+
+  router.push({ name: 'dashboard' });
 }
 
 interface CreateRequestResponse {

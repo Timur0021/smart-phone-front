@@ -57,8 +57,8 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, onMounted } from 'vue'
-import type { CSSProperties } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue';
+import type { CSSProperties } from 'vue';
 import { apolloClient } from "@/graphql/apolloClient.ts";
 import { REGISTER } from "@/graphql/mutations/auth/register.ts";
 import { useToast } from "vue-toastification";

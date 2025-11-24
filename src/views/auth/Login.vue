@@ -1,21 +1,21 @@
 <template>
   <div class="page" :style="pageStyle">
     <div class="card">
-      <h1 class="title">Реєстрація</h1>
+      <h1 class="title">Логін</h1>
 
       <form @submit.prevent="submit" class="form">
         <div class="form-group">
-          <input v-model="form.email" type="email" required placeholder=" " />
+          <input v-model="form.email" type="email" placeholder=" " />
           <label>Email</label>
         </div>
 
         <div class="form-group">
-          <input v-model="form.password" type="password" required placeholder=" " />
+          <input v-model="form.password" type="password" placeholder=" " />
           <label>Пароль</label>
         </div>
 
         <div class="checkbox-group">
-          <input v-model="form.acceptPolicy" type="checkbox" id="policy" required />
+          <input v-model="form.remember_me" type="checkbox" id="policy" />
           <label for="policy">
             Запамятати мене
           </label>
@@ -32,16 +32,21 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, onMounted } from 'vue'
-import type { CSSProperties } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue';
+import type { CSSProperties } from 'vue';
+import { apolloClient } from "@/graphql/apolloClient.ts";
+import { LOGIN } from "@/graphql/mutations/auth/logins.ts";
+import { useToast } from "vue-toastification";
+import { useRouter, useRoute } from 'vue-router';
+
+const toast = useToast();
+const router = useRouter();
+const route = useRoute();
 
 const form = reactive({
-  firstName: '',
-  lastName: '',
   email: '',
   password: '',
-  password_confirmation: '',
-  acceptPolicy: false,
+  remember_me: false,
 })
 
 const backgrounds = [
@@ -64,8 +69,39 @@ const pageStyle = computed<CSSProperties>(() => ({
   transition: 'background 1s ease-in-out'
 }))
 
-const submit = () => {
-  console.log(form)
+const submit = async () => {
+  if (!form.email || !form.password) {
+    toast.error("Будь ласка, заповніть усі поля!");
+    return;
+  }
+
+  try {
+    const { data } = await apolloClient.mutate({
+      mutation: LOGIN,
+      variables: {
+        input: {
+          email: form.email,
+          password: form.password,
+          remember_me: form.remember_me,
+        }
+      }
+    });
+
+    if (data?.login?.token) {
+      toast.success("Вхід успішний!");
+      localStorage.setItem("token", data.login.token);
+
+      await router.push({
+        name: 'home',
+        params: { lang: route.params.lang === 'en' ? 'en' : undefined }
+      });
+    } else {
+      toast.error("Невірні дані або проблема на сервері.");
+    }
+  } catch (error: any) {
+    console.log(error);
+    toast.error(error.message || "Помилка логіну");
+  }
 }
 
 const signInWithGoogle = () => {
