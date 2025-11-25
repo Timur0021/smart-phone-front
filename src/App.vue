@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import Header from '../src/layouts/header/Header.vue';
-import {computed} from "vue";
+import { computed } from "vue";
 
 const route = useRoute();
 const hideHeader = computed(() => {

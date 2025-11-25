@@ -16,7 +16,10 @@
           :key="index"
           class="category-card"
       >
-        <div class="card-content">{{ item.name }}</div>
+        <div class="category-image">
+          <img :src="item.image" :alt="item.name" />
+        </div>
+        <div class="category-title">{{ item.name }}</div>
       </SwiperSlide>
     </Swiper>
 
@@ -31,20 +34,18 @@ import { ref } from 'vue';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import 'swiper/css';
 
-interface Category { name: string; }
-
 const swiperInstance = ref<any>(null);
 const currentIndex = ref(0);
 
-const categories: Category[] = [
-  { name: "Смартфони" },
-  { name: "Ноутбуки" },
-  { name: "Телевізори" },
-  { name: "Планшети" },
-  { name: "Гаджети" },
-  { name: "Аксесуари" },
-  { name: "Навушники" },
-  { name: "Колонки" },
+const categories = [
+  { name: "Смартфони", image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9" },
+  { name: "Ноутбуки", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8" },
+  { name: "Телевізори", image: "https://images.unsplash.com/photo-1589654314443-1e1782b2c45d" },
+  { name: "Планшети", image: "https://images.unsplash.com/photo-1523473827532-4cff9bd6f97c" },
+  { name: "Гаджети", image: "https://images.unsplash.com/photo-1581090137578-2bfa5b1207a2" },
+  { name: "Аксесуари", image: "https://images.unsplash.com/photo-1573964376339-619f5112e88d" },
+  { name: "Навушники", image: "https://images.unsplash.com/photo-1518449028106-3a6c1f9f2f31" },
+  { name: "Колонки", image: "https://images.unsplash.com/photo-1583225155034-620f1bbc0aad" },
 ];
 
 function onSwiperInit(swiper: any) {
@@ -93,6 +94,32 @@ function slidePrev() {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* ✅ ДОДАНО: правильне центроване розміщення картинки та тексту */
+.category-card {
+  flex-direction: column;
+  gap: 14px;
+}
+
+.category-image {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.category-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.category-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
 }
 
 .category-card:hover {
@@ -145,6 +172,7 @@ function slidePrev() {
 .nav-card.next .arrow {
   transform: rotate(45deg);
 }
+
 @media (min-width: 2560px) {
   .category-slider {
     display: flex;
