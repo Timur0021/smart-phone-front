@@ -192,7 +192,7 @@
     padding-right: 4px;
 }
 .subcategory-menu a { padding: 20px 16px; text-decoration: none; color: #1e40af; font-weight: 700; font-size: 24px; }
-.subcategory-menu a:hover { background: #e0e7ff; color: #1e40af; }
+.subcategory-menu a:hover { background: #1e40af; color: #fff; }
 .subcategory-menu.scrollable a:hover { background: #1e40af; color: #fff; }
 
 .subcategory-menu.scrollable::-webkit-scrollbar { width: 6px; }

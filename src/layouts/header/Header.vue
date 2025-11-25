@@ -119,11 +119,6 @@
         <button @click="goToDashboard">
           <i class="fa-solid fa-user" style="color: #000000;"></i>
         </button>
-<!--        <button>-->
-<!--          <router-link :to="{name: 'dashboard'}">-->
-<!--            <i class="fa-solid fa-user"  style="color: #000000;"></i>-->
-<!--          </router-link>-->
-<!--        </button>-->
         <button>❤️</button>
         <button>🛒</button>
       </div>
