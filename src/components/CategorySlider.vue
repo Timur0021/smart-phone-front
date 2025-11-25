@@ -37,6 +37,19 @@ import 'swiper/css';
 const swiperInstance = ref<any>(null);
 const currentIndex = ref(0);
 
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  link: string;
+  children?: Category[];
+  will_be_soon?: boolean;
+  image?: string;
+}
+
+const props = defineProps<{
+  categories: Category[]
+}>();
 const categories = [
   { name: "Смартфони", image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9" },
   { name: "Ноутбуки", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8" },

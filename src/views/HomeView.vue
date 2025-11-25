@@ -1,7 +1,7 @@
 <template>
   <div>
     <SwiperSlider :banners="banners" />
-    <CategorySlider/>
+    <CategorySlider :categories="categories" />
     <h1>Welcome to my website!</h1>
   </div>
 </template>
@@ -15,7 +15,17 @@ import { GET_PAGE } from "@/graphql/queries/page/page.ts";
 import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
 
 const banners = ref<any[]>([])
-const categories = ref<{ id: string; name: string; link: string; children?: any[]; will_be_soon?: boolean }[]>([]);
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  link: string;
+  children?: Category[];
+  will_be_soon?: boolean;
+  image?: string;
+}
+
+const categories = ref<Category[]>([]);
 
 onMounted(async () => {
   try {
@@ -49,11 +59,13 @@ onMounted(async () => {
     categories.value = categoriesData.map((cat: any) => ({
       id: cat.id,
       name: cat.name,
+      slug: cat.slug,
       link: `/${cat.slug}`,
       will_be_soon: cat.will_be_soon || false,
       children: (cat.children || []).map((child: any) => ({
         id: child.id,
         name: child.name,
+        slug: child.slug,
         link: `/${cat.slug}/${child.slug}`,
         will_be_soon: child.will_be_soon || false,
       })),
