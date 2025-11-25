@@ -12,8 +12,8 @@
         :allow-touch-move="false"
     >
       <SwiperSlide
-          v-for="(item, index) in categories"
-          :key="index"
+          v-for="(item, index) in props.categories"
+          :key="item.id"
           class="category-card"
       >
         <div class="category-image">
@@ -34,9 +34,6 @@ import { ref } from 'vue';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import 'swiper/css';
 
-const swiperInstance = ref<any>(null);
-const currentIndex = ref(0);
-
 interface Category {
   id: string;
   name: string;
@@ -50,23 +47,16 @@ interface Category {
 const props = defineProps<{
   categories: Category[]
 }>();
-const categories = [
-  { name: "Смартфони", image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9" },
-  { name: "Ноутбуки", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8" },
-  { name: "Телевізори", image: "https://images.unsplash.com/photo-1589654314443-1e1782b2c45d" },
-  { name: "Планшети", image: "https://images.unsplash.com/photo-1523473827532-4cff9bd6f97c" },
-  { name: "Гаджети", image: "https://images.unsplash.com/photo-1581090137578-2bfa5b1207a2" },
-  { name: "Аксесуари", image: "https://images.unsplash.com/photo-1573964376339-619f5112e88d" },
-  { name: "Навушники", image: "https://images.unsplash.com/photo-1518449028106-3a6c1f9f2f31" },
-  { name: "Колонки", image: "https://images.unsplash.com/photo-1583225155034-620f1bbc0aad" },
-];
+
+const swiperInstance = ref<any>(null);
+const currentIndex = ref(0);
 
 function onSwiperInit(swiper: any) {
   swiperInstance.value = swiper;
 }
 
 function slideNext() {
-  if (swiperInstance.value && currentIndex.value < categories.length - 4) {
+  if (swiperInstance.value && currentIndex.value < props.categories.length - 4) {
     currentIndex.value++;
     swiperInstance.value.slideTo(currentIndex.value, 400);
   }
@@ -79,7 +69,6 @@ function slidePrev() {
   }
 }
 </script>
-
 <style scoped>
 .category-slider {
   display: flex;

@@ -60,6 +60,7 @@ onMounted(async () => {
       id: cat.id,
       name: cat.name,
       slug: cat.slug,
+      image: cat.image || '',
       link: `/${cat.slug}`,
       will_be_soon: cat.will_be_soon || false,
       children: (cat.children || []).map((child: any) => ({
@@ -68,6 +69,7 @@ onMounted(async () => {
         slug: child.slug,
         link: `/${cat.slug}/${child.slug}`,
         will_be_soon: child.will_be_soon || false,
+        image: child.image ?? null
       })),
     }));
   } catch (error) {
