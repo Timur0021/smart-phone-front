@@ -96,15 +96,14 @@ function slidePrev() {
   justify-content: center;
 }
 
-/* ✅ ДОДАНО: правильне центроване розміщення картинки та тексту */
 .category-card {
   flex-direction: column;
   gap: 14px;
 }
 
 .category-image {
-  width: 120px;
-  height: 120px;
+  width: 180px;
+  height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
