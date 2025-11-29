@@ -9,6 +9,11 @@ const routes = [
         props: true
     },
     {
+        path: '/:lang(en)?/blog',
+        name: 'blogs',
+        component: () => import('../views/Brands.vue')
+    },
+    {
         path: '/about',
         name: 'about',
         component: () => import('../views/AboutView.vue'),

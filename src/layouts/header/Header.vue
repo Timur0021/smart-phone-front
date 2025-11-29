@@ -21,7 +21,7 @@
         <RouterLink
             v-for="page in sidebarPages"
             :key="page.id"
-            to="/promotions/"
+            :to="`/${page.slug}`"
             class="page-link"
         >
           {{ page.title }}
