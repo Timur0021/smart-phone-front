@@ -14,7 +14,7 @@
             class="brand-card flex items-center justify-center bg-white rounded-lg border shadow p-4 cursor-pointer transition hover:bg-gray-100 hover:shadow-lg flex-shrink-0"
         >
           <div class="brand-image w-36 h-36 flex items-center justify-center bg-gray-50 rounded-md">
-            <img :src="brand.logo" :alt="brand.name" class="object-contain w-full h-full" />
+            <img :src="brand.image" :alt="brand.name" class="object-contain w-full h-full" />
           </div>
         </div>
       </div>
@@ -33,6 +33,7 @@ import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
 
 const banners = ref<any[]>([])
 const categories = ref<Category[]>([]);
+const brands = ref<Brand[]>([]);
 
 interface Category {
   id: string;
@@ -47,17 +48,11 @@ interface Category {
 interface Brand {
   id: number;
   name: string;
-  logo: string;
+  slug: string;
+  link: string;
+  image: string;
+  active: string;
 }
-
-const brands = ref<Brand[]>([
-  { id: 1, name: "Brand 1", logo: "https://picsum.photos/400/400?random=1" },
-  { id: 2, name: "Brand 2", logo: "https://picsum.photos/400/400?random=2" },
-  { id: 3, name: "Brand 3", logo: "https://picsum.photos/400/400?random=3" },
-  { id: 4, name: "Brand 4", logo: "https://picsum.photos/400/400?random=4" },
-  { id: 5, name: "Brand 5", logo: "https://picsum.photos/400/400?random=5" },
-  { id: 6, name: "Brand 6", logo: "https://picsum.photos/400/400?random=6" },
-]);
 
 onMounted(async () => {
   try {
@@ -87,6 +82,7 @@ onMounted(async () => {
     }) as any;
 
     const categoriesData = settingsData?.settings?.product_categories || [];
+    const brandsData = settingsData?.settings?.brands || [];
 
     categories.value = categoriesData.map((cat: any) => ({
       id: cat.id,
@@ -104,8 +100,19 @@ onMounted(async () => {
         image: child.image ?? null
       })),
     }));
+
+    if (brandsData.length) {
+      brands.value = brandsData.map((b: any) => ({
+        id: b.id,
+        name: b.name,
+        slug: b.slug,
+        link: b.link,
+        image: b.image,
+        active: b.active,
+      }));
+    }
   } catch (error) {
-    console.error("Помилка завантаження категорій:", error);
+    console.error("Помилка завантаження сетінгів:", error);
   }
 });
 </script>
@@ -170,7 +177,6 @@ onMounted(async () => {
 .brand-image {
   width: 144px;
   height: 144px;
-  background: #f9f9f9;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -241,7 +247,6 @@ onMounted(async () => {
   .brand-image {
     width: 144px;
     height: 144px;
-    background: #f9f9f9;
     display: flex;
     align-items: center;
     justify-content: center;

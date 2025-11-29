@@ -40,6 +40,14 @@ export const GET_SETTINGS = gql`
                 will_be_soon
               }
           }
+          brands {
+              id
+              name
+              slug
+              link
+              image
+              active
+          }
         }
     }
 `
