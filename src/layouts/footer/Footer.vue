@@ -151,8 +151,8 @@ import { RouterLink } from 'vue-router'
 }
 
 .menu-title {
-  font-weight: bold;
-  font-size: 1.125rem;
+  font-weight: 900;
+  font-size: 1.30rem;
   margin-bottom: 0.5rem;
   white-space: nowrap;
 }
