@@ -17,9 +17,9 @@ defineProps<{ href: string; text: string }>()
 <style scoped>
 .contact-block {
   display: flex;
-  flex-direction: row;   /* ➜ все на одній лінії */
-  align-items: center;   /* ➜ вирівнюємо по центру */
-  gap: 0.5rem;           /* ➜ відстань між "лейблом" і текстом */
+  flex-direction: row;
+  align-items: center;
+  gap: 5rem;
   font-size: 1.4rem;
   width: 100%;
   margin-top: -0.25rem;
@@ -29,11 +29,22 @@ defineProps<{ href: string; text: string }>()
   color: #ffffff;
   font-size: 1.4rem;
   text-decoration: none;
-  white-space: nowrap;   /* щоб текст не переносився */
+  white-space: nowrap;
+  position: relative;
 }
 
-.value:hover {
-  color: #ffffff;
-  text-decoration: none;
+.value::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background-color: #ffffff;
+  transition: width 0.3s ease;
+}
+
+.value:hover::after {
+  width: 100%;
 }
 </style>

@@ -14,9 +14,8 @@
               </svg>
             </a>
             <a target="_blank" href="https://www.instagram.com/teaua_marketplace/#" class="social-icon">
-              <svg viewBox="0 0 30 30" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="social-svg">
-                <path d="M20.021 2.5H9.934A7.443 7.443 0 0 0 2.5 9.935v10.088a7.442 7.442 0 0 0 7.435 7.433h10.088a7.442 7.442 0 0 0 7.433-7.435V9.934A7.443 7.443 0 0 0 20.021 2.5Z"/>
-                <path d="M14.978 8.524a6.462 6.462 0 0 0-6.453 6.454 6.462 6.462 0 0 0 6.454 6.455 6.462 6.462 0 0 0 6.455-6.455 6.463 6.463 0 0 0-6.456-6.453ZM21.445 10.119a1.546 1.546 0 1 0 0-3.093 1.546 1.546 0 0 0 0 3.093Z"/>
+              <svg viewBox="0 0 448 512" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="social-svg">
+                <path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9S160.5 370.9 224.1 370.9 339 319.6 339 256 287.7 141 224.1 141zm0 189.6c-41.2 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.5 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.9-26.9 26.9s-26.9-12-26.9-26.9 12-26.9 26.9-26.9 26.9 12 26.9 26.9zm76.1 27.2c-1.7-35.9-9.9-67.7-36-93.8s-58-34.3-93.8-36c-37-2.1-147.8-2.1-184.8 0-35.9 1.7-67.7 9.9-93.8 36S9.7 123.6 8 159.5c-2.1 37-2.1 147.8 0 184.8 1.7 35.9 9.9 67.7 36 93.8s58 34.3 93.8 36c37 2.1 147.8 2.1 184.8 0 35.9-1.7 67.7-9.9 93.8-36s34.3-58 36-93.8c2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.5 42.5-29.4 11.7-99.3 9-132.3 9s-102.9 2.6-132.3-9c-19.6-7.8-34.7-22.9-42.5-42.5-11.7-29.4-9-99.3-9-132.3s-2.6-102.9 9-132.3c7.8-19.6 22.9-34.7 42.5-42.5 29.4-11.7 99.3-9 132.3-9s102.9-2.6 132.3 9c19.6 7.8 34.7 22.9 42.5 42.5 11.7 29.4 9 99.3 9 132.3s2.7 102.9-9 132.3z"/>
               </svg>
             </a>
           </div>
@@ -55,19 +54,14 @@
 
       <hr class="footer-divider"/>
       <div class="footer-bottom">
-        <p class="footer-text">©TEA.ua © 2025. Всі права захищені</p>
-        <RouterLink class="footer-link" to="/privacy-policy/">Політика конфіденційності</RouterLink>
+        <p class="footer-text">© CYBERON.ua © 2025. Всі права захищені</p>
+        <RouterLink class="footer-text footer-link-center" to="/privacy-policy/">
+          Політика конфіденційності
+        </RouterLink>
         <div class="footer-bottom-right">
           <RouterLink target="_blank" class="footer-link dev-link" to="https://seok.ua/">
-            <svg viewBox="0 0 20 18" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="dev-svg">
-              <path d="M5.839 4.913c0 .534-.122 1-.366 1.399a2.51 2.51 0 0 1-1.023.933c-.439.223-.948.335-1.53.335-.582 0-1.092-.112-1.53-.335a2.516 2.516 0 0 1-1.024-.933C.122 5.912 0 5.447 0 4.913c0-.533.122-.998.366-1.398.245-.398.586-.71 1.023-.932.439-.224.948-.336 1.531-.336s1.091.112 1.53.336c.437.223.779.534 1.023.932.244.4.366.866.366 1.398Z"/>
-            </svg>
             <span>Розробка та просування.</span>
           </RouterLink>
-          <div class="language-switcher">
-            <span class="lang-active">ua</span>
-            <span>ru</span>
-          </div>
         </div>
       </div>
     </div>
@@ -136,7 +130,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .social-icon:hover {
-  background-color: #333333;
+  background-color: #5985eb;
   color: #FFFFFF;
 }
 
@@ -153,18 +147,28 @@ import { RouterLink } from 'vue-router'
 .menu-section {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
 }
 
 .menu-title {
   font-weight: bold;
   font-size: 1.125rem;
   margin-bottom: 0.5rem;
+  white-space: nowrap;
 }
 
 .menu-section ul {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 2rem;
+  margin: 1rem 0 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menu-section ul li {
+  padding-left: 0;
+  margin-left: 0;
 }
 
 .footer-contacts {
@@ -173,6 +177,7 @@ import { RouterLink } from 'vue-router'
   gap: 1rem;
   margin-top: 0.90rem;
 }
+
 .contact-block .label {
   font-weight: bold;
   min-width: 120px;
@@ -180,27 +185,49 @@ import { RouterLink } from 'vue-router'
 
 .footer-divider {
   height: 1px;
-  background-color: #444;
+  background-color: #FFFFFF;
   border: none;
   margin: 1.25rem 0;
 }
 
 .footer-bottom {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: flex-start;
-  font-size: 0.875rem;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: bold;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  gap: 1rem;
 }
 
-.footer-link {
-  color: rgba(255, 255, 255, 0.7);
+.footer-text {
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.footer-link-center {
+  text-align: center;
+  flex: 1;
+  color: #FFFFFF;
   text-decoration: none;
   transition: color 0.3s;
 }
 
-.footer-link:hover {
+.footer-link-center:hover {
   color: #FFFFFF;
+}
+
+.footer-bottom-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-link {
+  color: #FFFFFF;
+  text-decoration: none;
+  transition: color 0.3s;
+  margin-bottom: 0.50rem;
 }
 
 .footer-bottom-right {
@@ -210,32 +237,12 @@ import { RouterLink } from 'vue-router'
   margin-top: 0.5rem;
 }
 
-.dev-svg {
-  width: 18px;
-  height: 18px;
-  margin-right: 0.25rem;
-}
-
-.language-switcher {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border: 1px solid #666;
-  border-radius: 0.5rem;
-  overflow: hidden;
-  font-weight: bold;
-}
-
 .language-switcher span {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 0.25rem 0;
   text-transform: uppercase;
-}
-
-.language-switcher .lang-active {
-  background-color: #FFFFFF;
-  color: #1C1C1C;
 }
 
 @media(min-width: 1024px) {
