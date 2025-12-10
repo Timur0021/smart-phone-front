@@ -124,13 +124,8 @@ function slidePrev() {
 }
 
 .category-card:hover {
-  transform: translateY(-2px);
-  background: #f7f7f7;
-}
-
-.card-content {
-  font-size: 1.2rem;
-  font-weight: 600;
+  background: #FFFFFF;
+  border: 1.95px solid #2563eb;
 }
 
 .nav-card {
