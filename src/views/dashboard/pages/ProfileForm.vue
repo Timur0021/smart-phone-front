@@ -52,11 +52,6 @@
             <label>Пароль</label>
             <input type="password" v-model="form.password" placeholder="Введіть новий пароль" />
           </div>
-
-          <div class="form-group">
-            <label>Підтвердження паролю</label>
-            <input type="password" v-model="form.passwordConfirm" placeholder="Повторіть пароль" />
-          </div>
         </div>
 
         <div class="button-wrapper">
@@ -88,7 +83,6 @@ const form = reactive({
   email: user.email,
   phone: user.phone,
   password: '',
-  passwordConfirm: '',
   image: null
 });
 
@@ -103,11 +97,6 @@ const handleImageChange = (event: Event) => {
 };
 
 const handleSubmit = () => {
-  if (form.password !== form.passwordConfirm) {
-    toast.error('Паролі не співпадають!');
-    return;
-  }
-
   toast.success('Форма відправлена (поки без GraphQL)');
   console.log('Дані форми:', form);
 };
