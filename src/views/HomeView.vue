@@ -133,6 +133,7 @@ onMounted(async () => {
   font-weight: 700;
   font-family: 'Helvetica Neue', Arial, sans-serif;
   color: #1d4ed8;
+  margin-left: 5rem;
 }
 
 .brand-header button {
@@ -144,7 +145,7 @@ onMounted(async () => {
   border: none;
   cursor: pointer;
   min-width: 180px;
-  margin-right: 6rem;
+  margin-right: 13rem;
 }
 
 .brand-header button:hover {
@@ -206,6 +207,7 @@ onMounted(async () => {
     font-weight: 700;
     font-family: 'Helvetica Neue', Arial, sans-serif;
     color: #1d4ed8;
+    margin-left: 8rem;
   }
 
   .brand-header button {
@@ -218,7 +220,7 @@ onMounted(async () => {
     cursor: pointer;
     min-width: 180px;
     transition: background-color 0.3s ease;
-    margin-right: 15rem;
+    margin-right: 24rem;
   }
 
   .brand-header button:hover {
