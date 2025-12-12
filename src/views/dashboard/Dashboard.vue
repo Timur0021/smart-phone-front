@@ -36,6 +36,8 @@
         <span>Головна</span>
         <span>{{ breadcrumbLabel }}</span>
       </div>
+
+      <ProfileForm v-if="activeItem === 'profile'" />
       <slot></slot>
     </div>
   </div>
@@ -47,6 +49,8 @@ import { apolloClient } from "@/graphql/apolloClient.ts";
 import { LOGOUT } from "@/graphql/mutations/auth/logout.ts";
 import { useToast } from "vue-toastification";
 import  { useRoute, useRouter } from "vue-router";
+
+import ProfileForm from './pages/ProfileForm.vue';
 
 const activeItem = ref('profile');
 const toast = useToast();
