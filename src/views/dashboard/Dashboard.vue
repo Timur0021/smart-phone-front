@@ -168,7 +168,6 @@ const handleLogout = async () => {
 .content {
   flex-grow: 1;
   padding: 30px;
-  overflow-y: auto;
   background-color: #ffffff;
 }
 
