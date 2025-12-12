@@ -1,9 +1,8 @@
 import { gql } from "@apollo/client/core";
 
-
 export const GET_BRANDS = gql`
-    query Brands($search: String) {
-        brands(search: $search) {
+    query Brands {
+        brands {
             letters
             data {
                 letter

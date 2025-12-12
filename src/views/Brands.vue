@@ -6,7 +6,7 @@
 
     <div class="alphabet-box">
       <div
-          v-for="char in alphabet"
+          v-for="char in letters"
           :key="char"
           class="alphabet-item"
           @click="scrollToLetter(char)"
@@ -39,54 +39,34 @@
 
 <script setup lang="ts">
 import Breadcrumbs from '../views/Breadcrumbs.vue';
-import { ref } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import { apolloClient } from '@/graphql/apolloClient.ts';
+import { GET_BRANDS } from '@/graphql/queries/brands/brands.ts';
+import { useToast } from "vue-toastification";
 
-const alphabet = [
-  'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
-  '0','1','2','3','4','5','6','7','8','9',
-];
+const toast = useToast();
 
-const brandsByLetter: Record<string, { name: string, image: string }[]> = {
-  A: [
-    { name: 'Apple', image: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg' },
-    { name: 'Asus', image: 'https://upload.wikimedia.org/wikipedia/commons/6/65/ASUS_Logo.svg' },
-    { name: 'Audi', image: 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Audi_logo_2020.png' },
-  ],
-  B: [
-    { name: 'BMW', image: 'https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg' },
-    { name: 'Bosch', image: 'https://upload.wikimedia.org/wikipedia/commons/4/42/Bosch_logo.svg' },
-    { name: 'BenQ', image: 'https://upload.wikimedia.org/wikipedia/commons/0/0f/BenQ_logo.svg' },
-  ],
-  C: [
-    { name: 'Canon', image: 'https://upload.wikimedia.org/wikipedia/commons/4/4a/Canon_logo.svg' },
-    { name: 'Citroen', image: 'https://upload.wikimedia.org/wikipedia/commons/9/9b/Citroën_logo.svg' },
-  ],
-  D: [
-    { name: 'Dell', image: 'https://upload.wikimedia.org/wikipedia/commons/4/48/Dell_Logo.svg' },
-    { name: 'Dacia', image: 'https://upload.wikimedia.org/wikipedia/commons/7/79/Dacia_logo.svg' },
-  ],
-  E: [
-    { name: 'Ericsson', image: 'https://upload.wikimedia.org/wikipedia/commons/4/4a/Ericsson_logo.svg' },
-    { name: 'Epson', image: 'https://upload.wikimedia.org/wikipedia/commons/4/43/Epson_logo.svg' },
-  ],
-  F: [
-    { name: 'Ford', image: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Ford_logo_flat.svg' },
-    { name: 'Fujitsu', image: 'https://upload.wikimedia.org/wikipedia/commons/0/0d/Fujitsu_logo.svg' },
-  ],
-  G: [
-    { name: 'Google', image: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg' },
-    { name: 'GoPro', image: 'https://upload.wikimedia.org/wikipedia/commons/0/0c/GoPro_logo.svg' },
-  ],
-  H: [
-    { name: 'Honda', image: 'https://upload.wikimedia.org/wikipedia/commons/7/7f/Honda_logo.svg' },
-    { name: 'HP', image: 'https://upload.wikimedia.org/wikipedia/commons/3/3a/HP_logo_2012.svg' },
-  ],
-  I: [
-    { name: 'IBM', image: 'https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg' },
-    { name: 'Intel', image: 'https://upload.wikimedia.org/wikipedia/commons/c/c9/Intel-logo.svg' },
-  ],
-};
+interface Brand {
+  id: number;
+  name: string;
+  slug: string;
+  link: string;
+  image: string;
+  active: boolean;
+}
 
+const letters = ref<string[]>([]);
+const rawData = ref<any[]>([]);
+
+const brandsByLetter = computed(() => {
+  const map: Record<string, Brand[]> = {};
+
+  rawData.value.forEach((row: any) => {
+    map[row.letter] = row.brands;
+  });
+
+  return map;
+});
 
 const scrollToLetter = (char: string) => {
   const el = document.getElementById('letter-' + char);
@@ -94,6 +74,26 @@ const scrollToLetter = (char: string) => {
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 };
+
+onMounted(async () => {
+  try {
+    const { data } = await apolloClient.query({
+      query: GET_BRANDS,
+      fetchPolicy: 'no-cache',
+    });
+
+    letters.value = data.brands.letters ?? [];
+    rawData.value = data.brands.data ?? [];
+  } catch (e: any) {
+    console.error("Помилка завантаження брендів:", e);
+
+    toast.error(
+        e.message
+            ? `Помилка завантаження брендів: ${e.message}`
+            : "Сталася невідома помилка при завантаженні брендів"
+    );
+  }
+});
 </script>
 
 <style scoped>
@@ -116,7 +116,6 @@ const scrollToLetter = (char: string) => {
   margin-bottom: 40px;
   margin-left: 210px;
   max-width: 1500px;
-  width: fit-content;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
