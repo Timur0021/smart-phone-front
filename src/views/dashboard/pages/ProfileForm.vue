@@ -106,7 +106,7 @@ const handleSubmit = () => {
 .profile-form-wrapper {
   display: flex;
   justify-content: flex-start;
-  padding-top: 20px;
+  padding-top: 90px;
   padding-left: 50px;
   width: 100%;
 }
