@@ -19,6 +19,30 @@
         </div>
       </div>
     </section>
+    <section class="subscribe-section">
+      <div class="subscribe-overlay">
+        <div class="subscribe-content">
+          <h2 class="subscribe-title">
+            <span v-html="formattedTitle"></span>
+          </h2>
+
+          <p class="subscribe-text">
+            Отримуйте першими інформацію про знижки, акції та нові бренди
+          </p>
+
+          <div class="subscribe-input-wrapper">
+            <input
+                type="email"
+                placeholder="Ваш email"
+                class="subscribe-input"
+            />
+            <button class="subscribe-button">
+              Надіслати
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
     <h1>Welcome to my website!</h1>
   </div>
 </template>
@@ -26,7 +50,7 @@
 <script setup lang="ts">
 import SwiperSlider from "@/components/SwiperSlider.vue";
 import CategorySlider from "@/components/CategorySlider.vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { apolloClient } from "@/graphql/apolloClient.ts";
 import { GET_PAGE } from "@/graphql/queries/page/page.ts";
 import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
@@ -53,6 +77,19 @@ interface Brand {
   image: string;
   active: string;
 }
+
+const title = ref("Підпишіться на новинки");
+
+const formattedTitle = computed(() => {
+  const words = title.value.split(" ");
+  const lines: string[] = [];
+
+  for (let i = 0; i < words.length; i += 3) {
+    lines.push(words.slice(i, i + 3).join(" "));
+  }
+
+  return lines.map(line => `<span>${line}</span>`).join("<br/>");
+});
 
 onMounted(async () => {
   try {
@@ -191,6 +228,111 @@ onMounted(async () => {
   max-height: 100%;
 }
 
+.subscribe-section {
+  height: 560px;
+  max-width: 108rem;
+  margin: 180px auto 0;
+  background-image: url('@/assets/foto.png');
+  background-size: cover;
+  background-position: center;
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.subscribe-overlay {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0.35) 45%,
+      rgba(0, 0, 0, 0.1) 100%
+  );
+  display: flex;
+  align-items: center;
+}
+
+.subscribe-content {
+  max-width: 520px;
+  margin-left: 7rem;
+  color: white;
+  padding-top: 40px;
+}
+
+.subscribe-title {
+  font-size: 3.4rem;
+  font-weight: 700;
+  margin-top: -20px;
+  margin-bottom: 12px;
+  max-width: 20ch;
+  word-wrap: break-word;
+  line-height: 1.2;
+}
+
+.subscribe-title span {
+  display: inline-block;
+  white-space: nowrap;
+  margin-right: 0.5rem;
+  margin-bottom: 5rem;
+}
+
+.subscribe-title br {
+  content: "";
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.subscribe-text {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  margin-bottom: 28px;
+  opacity: 0.95;
+}
+
+.subscribe-input-wrapper {
+  position: relative;
+  width: 110%;
+  height: 64px;
+  border-radius: 999px;
+  background: white;
+  overflow: hidden;
+}
+
+
+.subscribe-input {
+  width: 100%;
+  height: 100%;
+  padding: 0 180px 0 24px;
+  font-size: 1.1rem;
+  border: none;
+  outline: none;
+  border-radius: 999px;
+}
+
+.subscribe-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  padding: 0 40px;
+  border: none;
+  border-radius: 999px;
+  background-color: #2563eb;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.subscribe-button:hover {
+  background-color: #1d4ed8;
+}
+
 @media (min-width: 2560px) {
   .brand-section {
     margin-top: 60px;
@@ -261,6 +403,117 @@ onMounted(async () => {
   .brand-image img {
     max-width: 110%;
     max-height: 110%;
+  }
+
+  .subscribe-section {
+    height: 560px;
+    max-width: 108rem;
+    margin: 180px auto 0;
+    background-image: url('@/assets/foto.png');
+    background-size: cover;
+    background-position: center;
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .subscribe-overlay {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.55) 0%,
+        rgba(0, 0, 0, 0.35) 45%,
+        rgba(0, 0, 0, 0.1) 100%
+    );
+    display: flex;
+    align-items: center;
+  }
+
+  .subscribe-content {
+    max-width: 520px;
+    margin-left: 7rem;
+    color: white;
+    padding-top: 40px;
+  }
+
+  .subscribe-title {
+    font-size: 3.4rem;
+    font-weight: 700;
+    margin-top: -40px;
+    margin-bottom: 24px;
+    max-width: 20ch;
+    word-wrap: break-word;
+    line-height: 1.2;
+  }
+
+  .subscribe-text {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    opacity: 0.95;
+  }
+
+  .subscribe-title span {
+    display: inline-block;
+    white-space: nowrap;
+    margin-right: 0.5rem;
+    margin-bottom: 5rem;
+  }
+
+  .subscribe-title br {
+    content: "";
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .subscribe-text {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    opacity: 0.95;
+  }
+
+  .subscribe-input-wrapper {
+    position: relative;
+    width: 110%;
+    height: 64px;
+    border-radius: 999px;
+    background: white;
+    overflow: hidden;
+  }
+
+
+  .subscribe-input {
+    width: 100%;
+    height: 100%;
+    padding: 0 180px 0 24px;
+    font-size: 1.1rem;
+    border: none;
+    outline: none;
+    border-radius: 999px;
+  }
+
+  .subscribe-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    padding: 0 40px;
+    border: none;
+    border-radius: 999px;
+    background-color: #2563eb;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .subscribe-button:hover {
+    background-color: #1d4ed8;
   }
 }
 </style>
