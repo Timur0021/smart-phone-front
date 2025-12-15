@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <SwiperSlider :banners="banners" />
     <CategorySlider :categories="categories" />
     <section class="brand-section mt-8">
@@ -155,14 +155,17 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.brand-section {
-  margin-top: 60px;
+.container {
+  max-width: 1700px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 100px;
 }
 .brand-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-left: 7rem;
 }
 
 .brand-title-header {
@@ -170,7 +173,6 @@ onMounted(async () => {
   font-weight: 700;
   font-family: 'Helvetica Neue', Arial, sans-serif;
   color: #1d4ed8;
-  margin-left: 5rem;
 }
 
 .brand-header button {
@@ -182,7 +184,6 @@ onMounted(async () => {
   border: none;
   cursor: pointer;
   min-width: 180px;
-  margin-right: 13rem;
 }
 
 .brand-header button:hover {
@@ -230,8 +231,6 @@ onMounted(async () => {
 
 .subscribe-section {
   height: 560px;
-  max-width: 108rem;
-  margin: 180px auto 0;
   background-image: url('@/assets/foto.png');
   background-size: cover;
   background-position: center;
@@ -335,13 +334,18 @@ onMounted(async () => {
 
 @media (min-width: 2560px) {
   .brand-section {
-    margin-top: 60px;
+    .container {
+      max-width: 2050px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 100px;
+    }
   }
   .brand-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-left: 15rem;
   }
 
   .brand-title-header {
@@ -349,7 +353,6 @@ onMounted(async () => {
     font-weight: 700;
     font-family: 'Helvetica Neue', Arial, sans-serif;
     color: #1d4ed8;
-    margin-left: 8rem;
   }
 
   .brand-header button {
@@ -360,9 +363,7 @@ onMounted(async () => {
     border-radius: 20px;
     border: none;
     cursor: pointer;
-    min-width: 180px;
     transition: background-color 0.3s ease;
-    margin-right: 24rem;
   }
 
   .brand-header button:hover {
@@ -370,16 +371,14 @@ onMounted(async () => {
   }
 
   .brands-row {
-    display: flex;
     gap: 25px;
-    flex-wrap: nowrap;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
     padding-bottom: 8px;
   }
 
   .brand-card {
     flex: 0 0 auto;
-    width: 320px;
     height: 260px;
     background: white;
     border-radius: 12px;
@@ -407,8 +406,6 @@ onMounted(async () => {
 
   .subscribe-section {
     height: 560px;
-    max-width: 108rem;
-    margin: 180px auto 0;
     background-image: url('@/assets/foto.png');
     background-size: cover;
     background-position: center;

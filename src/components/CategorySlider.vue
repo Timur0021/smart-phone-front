@@ -74,8 +74,6 @@ function slidePrev() {
   display: flex;
   align-items: center;
   gap: 14px;
-  max-width: 1700px;
-  margin: 1.5rem auto 0;
 }
 
 .category-swiper {
@@ -174,8 +172,6 @@ function slidePrev() {
     display: flex;
     align-items: center;
     gap: 14px;
-    max-width: 2050px;
-    margin: 1.5rem auto 0;
   }
 }
 </style>
