@@ -47,8 +47,12 @@
                 type="email"
                 placeholder="Ваш email"
                 class="subscribe-input"
+                v-model="email"
             />
-            <button class="subscribe-button">
+            <button
+                class="subscribe-button"
+                @click="handleSubscribe"
+            >
               Надіслати
             </button>
           </div>
@@ -60,13 +64,18 @@
 </template>
 
 <script setup lang="ts">
-import SwiperSlider from "@/components/SwiperSlider.vue";
-import CategorySlider from "@/components/CategorySlider.vue";
 import { ref, onMounted, computed } from "vue";
 import { apolloClient } from "@/graphql/apolloClient.ts";
+import SwiperSlider from "@/components/SwiperSlider.vue";
+import CategorySlider from "@/components/CategorySlider.vue";
 import { GET_PAGE } from "@/graphql/queries/page/page.ts";
 import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
+import { CREATE_SUBSCRIBE } from "@/graphql/mutations/notification/subscribe.ts";
+import { useToast } from "vue-toastification";
 
+const toast = useToast();
+
+const email = ref("");
 const banners = ref<any[]>([])
 const categories = ref<Category[]>([]);
 const brands = ref<Brand[]>([]);
@@ -99,6 +108,41 @@ interface SubscribeBlock {
   title: string
   subtitle: string
   image: string
+}
+
+interface SubscribeMutationResponse {
+  subscribe: {
+    message: string;
+    status: 'success' | 'error';
+  };
+}
+
+const handleSubscribe = async () => {
+  if (!email.value) {
+    toast.warning("Введіть емейл")
+    return;
+  }
+
+  try {
+    const { data } = await apolloClient.mutate<SubscribeMutationResponse>({
+      mutation: CREATE_SUBSCRIBE,
+      variables: {
+        input: {
+          email: email.value
+        }
+      }
+    });
+
+    if (data?.subscribe?.status === "success") {
+      toast.success(data.subscribe.message);
+      email.value = "";
+    } else if (data?.subscribe) {
+      toast.error(data.subscribe.message);
+    }
+  } catch (error: any) {
+    console.error(error);
+    toast.error("Сталася помилка при підписці")
+  }
 }
 
 const formattedTitle = computed(() => {
