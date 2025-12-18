@@ -5,7 +5,12 @@
     <section class="brand-section mt-8">
       <div class="brand-header mb-4">
         <h2 class="brand-title-header">Бренди</h2>
-        <button class="text-blue-600 hover:underline">Всі бренди</button>
+        <router-link
+            :to="{ name: 'brands' }"
+            class="text-blue-600 hover:underline brand-button"
+        >
+          Всі бренди
+        </router-link>
       </div>
       <div class="brands-row flex gap-4 overflow-x-auto">
         <div
@@ -205,6 +210,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 100px;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
 }
 .brand-header {
   display: flex;
@@ -215,25 +221,24 @@ onMounted(async () => {
 .brand-title-header {
   font-size: 3rem;
   font-weight: 700;
-  font-family: 'Helvetica Neue', Arial, sans-serif;
   color: #1d4ed8;
 }
 
-.brand-header button {
+.brand-button {
   font-size: 1.25rem;
-  padding: 1.30rem 1.30rem;
+  padding: 1.30rem;
   background-color: #1d4ed8;
   color: white;
   border-radius: 20px;
-  border: none;
-  cursor: pointer;
   min-width: 180px;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none;
 }
 
-.brand-header button:hover {
+.brand-button:hover {
   background-color: #2563eb;
 }
-
 .brands-row {
   display: flex;
   gap: 20px;
@@ -280,7 +285,6 @@ onMounted(async () => {
   border-radius: 24px;
   overflow: hidden;
   position: relative;
-  font-family: 'Helvetica Neue', Arial, sans-serif;
 }
 
 .subscribe-overlay {
@@ -383,6 +387,7 @@ onMounted(async () => {
       display: flex;
       flex-direction: column;
       gap: 100px;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
     }
   }
   .brand-header {
@@ -394,7 +399,6 @@ onMounted(async () => {
   .brand-title-header {
     font-size: 3rem;
     font-weight: 700;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
     color: #1d4ed8;
   }
 
