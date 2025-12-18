@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <SwiperSlider :banners="banners" />
-    <CategorySlider :categories="categories" />
+    <SwiperSlider :banners="banners"/>
+    <CategorySlider :categories="categories"/>
     <section class="brand-section mt-8">
       <div class="brand-header mb-4">
         <h2 class="brand-title-header">Бренди</h2>
@@ -19,7 +19,14 @@
         </div>
       </div>
     </section>
-    <section class="subscribe-section">
+    <section
+        class="subscribe-section"
+        :style="{
+          backgroundImage: subscribe.image
+            ? `url(${subscribe.image})`
+            : undefined
+        }"
+    >
       <div class="subscribe-overlay">
         <div class="subscribe-content">
           <h2 class="subscribe-title">
@@ -27,7 +34,7 @@
           </h2>
 
           <p class="subscribe-text">
-            Отримуйте першими інформацію про знижки, акції та нові бренди
+            {{ subscribe.subtitle }}
           </p>
 
           <div class="subscribe-input-wrapper">
@@ -58,6 +65,11 @@ import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
 const banners = ref<any[]>([])
 const categories = ref<Category[]>([]);
 const brands = ref<Brand[]>([]);
+const subscribe = ref<SubscribeBlock>({
+  title: '',
+  subtitle: '',
+  image: ''
+})
 
 interface Category {
   id: string;
@@ -78,18 +90,28 @@ interface Brand {
   active: string;
 }
 
-const title = ref("Підпишіться на новинки");
+interface SubscribeBlock {
+  title: string
+  subtitle: string
+  image: string
+}
 
 const formattedTitle = computed(() => {
-  const words = title.value.split(" ");
-  const lines: string[] = [];
+  const rawTitle = subscribe.value.title || ''
+
+  if (!rawTitle) return ''
+
+  const words = rawTitle.split(' ')
+  const lines: string[] = []
 
   for (let i = 0; i < words.length; i += 3) {
-    lines.push(words.slice(i, i + 3).join(" "));
+    lines.push(words.slice(i, i + 3).join(' '))
   }
 
-  return lines.map(line => `<span>${line}</span>`).join("<br/>");
-});
+  return lines
+      .map(line => `<span>${line}</span>`)
+      .join('<br/>')
+})
 
 onMounted(async () => {
   try {
@@ -102,12 +124,34 @@ onMounted(async () => {
     const mainBanner = blocks.find((b: any) => b.type === "main_banner");
     const items = mainBanner.block[0].data.find((d: any) => d.key === "items");
 
+    const subscribeBlock = blocks.find((b: any) => b.type === "subscribe");
+
     banners.value = items.items.map((banner: any) => {
       const obj: any = {};
       banner.data.forEach((item: any) => (obj[item.key] = item.value));
 
       return obj;
     });
+
+    if (subscribeBlock) {
+      subscribeBlock.block.forEach((block: any) => {
+        const dataObj: any = {}
+
+        block.data.forEach((d: any) => {
+          dataObj[d.key] = d.value
+        })
+
+        if (block.type === 'title' && !subscribe.value.title) {
+          subscribe.value.title = dataObj.title
+        } else if (block.type === 'title') {
+          subscribe.value.subtitle = dataObj.title
+        }
+
+        if (block.type === 'image') {
+          subscribe.value.image = dataObj.image
+        }
+      })
+    }
   } catch (error) {
     console.error("Помилка завантаження бенерів:", error);
   }
@@ -231,7 +275,6 @@ onMounted(async () => {
 
 .subscribe-section {
   height: 560px;
-  background-image: url('@/assets/foto.png');
   background-size: cover;
   background-position: center;
   border-radius: 24px;
