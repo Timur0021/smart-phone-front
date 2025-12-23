@@ -7,6 +7,11 @@
             <label class="avatar-button">
               <template v-if="previewImage || user.image">
                 <img :src="previewImage || user.image" alt="avatar" class="avatar"/>
+                <button
+                    type="button"
+                    class="remove-avatar-btn"
+                    @click.prevent="removeAvatar"
+                >×</button>
               </template>
               <template v-else>
                 <div class="avatar-placeholder">
@@ -71,14 +76,31 @@ import { GET_CURRENT_USER } from "@/graphql/queries/customer-dashboard/getCurren
 
 const toast = useToast();
 
-const user = reactive({
-  id: null as number | null,
+const user = reactive<{
+  id: number | null;
+  name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  password: string;
+  image: string;
+  image_object: {
+    id: number;
+    file_name: string;
+    url: string;
+    size: number;
+    mime_type: string;
+    created_at: string;
+  } | null;
+}>({
+  id: null,
   name: '',
   last_name: '',
   email: '',
   phone: '',
   password: '',
-  image: ''
+  image: '',
+  image_object: null,
 });
 
 const form = reactive<{
@@ -96,6 +118,36 @@ const form = reactive<{
   password: '',
   image: null,
 });
+
+const removeAvatar = async () => {
+  if (!user.image_object?.id) return;
+
+  try {
+    const res = await fetch('http://smart-phone.test/api/temporary-files', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify({ file_id: user.image_object.id }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.status === 'success') {
+      toast.success('Аватар видалено');
+      form.image = null;
+      previewImage.value = null;
+      user.image = '';
+      user.image_object = null;
+    } else {
+      toast.error(data.error || 'Помилка видалення аватарки');
+    }
+  } catch (e) {
+    console.error(e);
+    toast.error('Помилка зʼєднання з сервером');
+  }
+};
 
 const previewImage = ref<string | null>(null);
 
@@ -196,7 +248,7 @@ onMounted(async () => {
 
     if (data?.currentUser) {
       Object.assign(user, data.currentUser);
-
+      console.log(user)
       form.name = user.name;
       form.last_name = user.last_name;
       form.email = user.email;
@@ -256,6 +308,30 @@ onMounted(async () => {
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+}
+
+.remove-avatar-btn {
+  position: absolute;
+  top: 5.8rem;
+  left: 3rem;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background 0.2s;
+}
+
+.remove-avatar-btn:hover {
+  background: rgba(0,0,0,0.8);
 }
 
 .avatar-placeholder {
