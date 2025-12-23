@@ -9,6 +9,7 @@ export const UPDATE_PERSONAL_DATA = gql`
             email
             phone
             password
+            image
             i_agree
             remember_me
             created_at

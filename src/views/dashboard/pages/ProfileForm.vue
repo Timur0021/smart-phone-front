@@ -50,7 +50,7 @@
 
           <div class="form-group">
             <label>Пароль</label>
-            <input type="password" v-model="form.password" placeholder="Введіть новий пароль" />
+            <input type="password" v-model="form.password" autocomplete="new-password" placeholder="Введіть новий пароль" />
           </div>
         </div>
 
@@ -63,30 +63,77 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useToast } from 'vue-toastification';
+import { apolloClient} from "@/graphql/apolloClient.ts";
+import { UPDATE_PERSONAL_DATA} from "@/graphql/mutations/customer-dashboard/updatePersonalData.ts";
+import { GET_CURRENT_USER } from "@/graphql/queries/customer-dashboard/getCurrentUser.ts";
 
 const toast = useToast();
 
-const user = {
-  name: 'Тарас',
-  last_name: 'Шевченко',
-  email: 'taras@example.com',
-  phone: '+38 (033) 333 33 33',
+const user = reactive({
+  id: null as number | null,
+  name: '',
+  last_name: '',
+  email: '',
+  phone: '',
   password: '',
   image: ''
-};
+});
 
-const form = reactive({
+const form = reactive<{
+  name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  password: string;
+  image: File | null;
+}>({
   name: user.name,
   last_name: user.last_name,
   email: user.email,
   phone: user.phone,
   password: '',
-  image: null
+  image: null,
 });
 
 const previewImage = ref<string | null>(null);
+
+const uploadTemporaryFile = async (file: File): Promise<number | null> => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const res = await fetch('http://smart-phone.test/api/temporary-files', {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+    });
+
+
+    if (!res.ok) {
+      toast.error('Помилка завантаження фото');
+      return null;
+    }
+
+    const data = await res.json();
+
+    if (!data.temporaryFile) {
+      toast.error('Не вдалося отримати ID файлу');
+      return null;
+    }
+
+    if (typeof data.temporaryFile === 'number') {
+      return data.temporaryFile;
+    }
+
+    return data.temporaryFile.id ?? null;
+  } catch (error) {
+    console.error(error);
+    toast.error('Помилка зʼєднання з сервером');
+    return null;
+  }
+};
 
 const handleImageChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
@@ -96,10 +143,69 @@ const handleImageChange = (event: Event) => {
   }
 };
 
-const handleSubmit = () => {
-  toast.success('Форма відправлена (поки без GraphQL)');
-  console.log('Дані форми:', form);
+const handleSubmit = async () => {
+  const input: Record<string, any> = {};
+
+  if (form.name !== user.name) input.name = form.name;
+  if (form.last_name !== user.last_name) input.last_name = form.last_name;
+  if (form.email !== user.email) input.email = form.email;
+  if (form.phone !== user.phone) input.phone = form.phone;
+  if (form.password) input.password = form.password;
+
+  if (form.image) {
+    const temporaryFileId = await uploadTemporaryFile(form.image);
+    if (!temporaryFileId) return;
+    input.image = temporaryFileId;
+  }
+
+  if (Object.keys(input).length === 0) {
+    toast.info('Немає змін для оновлення');
+    return;
+  }
+
+  try {
+    const result = await apolloClient.mutate({
+      mutation: UPDATE_PERSONAL_DATA,
+      variables: { input },
+      context: {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      },
+    });
+
+    toast.success('Дані успішно оновлені!');
+    Object.assign(user, input);
+  } catch (e) {
+    console.error(e);
+    toast.error('Помилка при оновленні даних');
+  }
 };
+
+onMounted(async () => {
+  try {
+    const { data } = await apolloClient.query({
+      query: GET_CURRENT_USER,
+      fetchPolicy: 'no-cache',
+      context: {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    });
+
+    if (data?.currentUser) {
+      Object.assign(user, data.currentUser);
+
+      form.name = user.name;
+      form.last_name = user.last_name;
+      form.email = user.email;
+      form.phone = user.phone;
+    }
+  } catch (e) {
+    console.error(e);
+  }
+});
 </script>
 
 <style scoped>

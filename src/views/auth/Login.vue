@@ -91,6 +91,13 @@ const submit = async () => {
       toast.success("Вхід успішний!");
       localStorage.setItem("token", data.login.token);
 
+      localStorage.setItem("remember_me", form.remember_me ? "true" : "false");
+      if (form.remember_me) {
+        localStorage.setItem("saved_email", form.email);
+      } else {
+        localStorage.removeItem("saved_email");
+      }
+
       await router.push({
         name: 'home',
         params: { lang: route.params.lang === 'en' ? 'en' : undefined }
@@ -109,6 +116,14 @@ const signInWithGoogle = () => {
 }
 
 onMounted(() => {
+  const remember = localStorage.getItem("remember_me");
+  if (remember === "true") {
+    form.remember_me = true;
+
+    const savedEmail = localStorage.getItem("saved_email");
+    if (savedEmail) form.email = savedEmail;
+  }
+
   setInterval(() => {
     currentBg.value = (currentBg.value + 1) % backgrounds.length
   }, 5000)
