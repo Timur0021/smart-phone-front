@@ -298,7 +298,6 @@ const totalPages = computed(() => Math.ceil(blogs.value.length / perPage))
   border-color: #007bff;
 }
 
-/* Стилі для стрілок */
 .arrow {
   width: 40px;
   height: 40px;
