@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import Breadcrumbs from '../views/Breadcrumbs.vue';
+import Breadcrumbs from '../Breadcrumbs.vue';
 import { ref, onMounted, computed } from 'vue';
 import { apolloClient } from '@/graphql/apolloClient.ts';
 import { GET_BRANDS } from '@/graphql/queries/brands/brands.ts';

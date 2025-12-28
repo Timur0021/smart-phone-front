@@ -11,7 +11,12 @@ const routes = [
     {
         path: '/:lang(en)?/brands',
         name: 'brands',
-        component: () => import('../views/Brands.vue')
+        component: () => import('../views/brands/Brands.vue')
+    },
+    {
+        path: '/:lang(en)?/blogs',
+        name: 'blogs',
+        component: () => import('../views/blogs/Blogs.vue')
     },
     {
         path: '/about',
