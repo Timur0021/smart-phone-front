@@ -36,18 +36,40 @@
     </div>
 
     <div class="pagination">
-      <button :disabled="page === 1" @click="page--">‹</button>
-      <span>Сторінка {{ page }}</span>
-      <button @click="page++">›</button>
+      <button
+          class="arrow"
+          :disabled="page === 1"
+          @click="page--"
+      >
+        ‹
+      </button>
+
+      <button
+          v-for="pageNumber in totalPages"
+          :key="pageNumber"
+          :class="['page-number', { active: pageNumber === page }]"
+          @click="page = pageNumber"
+      >
+        {{ pageNumber }}
+      </button>
+
+      <button
+          class="arrow"
+          :disabled="page === totalPages"
+          @click="page++"
+      >
+        ›
+      </button>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const activeCategory = ref<number>(1)
 const page = ref(1)
+const perPage = 1
 
 const categories = ref([
   { id: 1, name: 'Всі статті' },
@@ -86,6 +108,8 @@ const blogs = ref([
     image: 'https://via.placeholder.com/400x250',
   },
 ])
+
+const totalPages = computed(() => Math.ceil(blogs.value.length / perPage))
 </script>
 
 <style scoped>
@@ -140,7 +164,7 @@ const blogs = ref([
   border: 1px solid #ddd;
   background: #fff;
   cursor: pointer;
-  font-size: 32px;
+  font-size: 30px;
   font-family: 'Helvetica Neue', Arial, sans-serif;
   transition: all 0.2s ease;
 }
@@ -247,21 +271,56 @@ const blogs = ref([
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
-.pagination button {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid #ddd;
+.page-number {
+  width: 40px;
+  height: 40px;
   background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
 }
 
-.pagination button:disabled {
+.page-number:hover {
+  background: #f0f0f0;
+}
+
+.page-number.active {
+  background: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+/* Стилі для стрілок */
+.arrow {
+  width: 40px;
+  height: 40px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.arrow:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+.arrow:hover:not(:disabled) {
+  background: #0056b3;
 }
 
 @media (min-width: 2560px) {
