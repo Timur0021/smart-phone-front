@@ -30,7 +30,7 @@
           </div>
           <h3 class="blog-card-title">{{ blog.title }}</h3>
           <p class="blog-card-excerpt">{{ blog.excerpt }}</p>
-          <router-link :to="`/blog/${blog.id}`" class="read-more">Читати більше</router-link>
+          <router-link :to="`/blog/${blog.slug}`" class="read-more">Читати більше</router-link>
         </div>
       </article>
     </div>
@@ -83,6 +83,7 @@ const blogs = ref([
   {
     id: 1,
     title: 'Як правильно писати блог',
+    slug: 'iag-1',
     excerpt: 'Короткий опис статті у 2–3 рядки, який зацікавлює читача.',
     category: 'Гіди',
     category_slug: 'guides',
@@ -92,6 +93,7 @@ const blogs = ref([
   {
     id: 2,
     title: 'Нові тренди 2025',
+    slug: 'iag-1',
     excerpt: 'Огляд ключових трендів цього року та їх впливу на бізнес.',
     category: 'Аналітика',
     category_slug: 'analytics',
@@ -101,6 +103,7 @@ const blogs = ref([
   {
     id: 3,
     title: 'Що нового у Vue 3',
+    slug: 'iag-1',
     excerpt: 'Розбираємо нові можливості фреймворку та best practices.',
     category: 'Новини',
     category_slug: 'news',
