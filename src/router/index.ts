@@ -19,6 +19,12 @@ const routes = [
         component: () => import('../views/blogs/Blogs.vue')
     },
     {
+        path: '/:lang(en)?/blog/:id',
+        name: 'blog-single',
+        component: () => import('../views/blogs/Blog.vue'),
+        props: true,
+    },
+    {
         path: '/about',
         name: 'about',
         component: () => import('../views/AboutView.vue'),
