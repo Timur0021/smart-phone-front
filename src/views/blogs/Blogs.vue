@@ -110,6 +110,46 @@ const blogs = ref([
     date: '23 грудня 2025',
     image: 'https://via.placeholder.com/400x250',
   },
+  {
+    id: 3,
+    title: 'Що нового у Vue 3',
+    slug: 'iag-1',
+    excerpt: 'Розбираємо нові можливості фреймворку та best practices.',
+    category: 'Новини',
+    category_slug: 'news',
+    date: '23 грудня 2025',
+    image: 'https://via.placeholder.com/400x250',
+  },
+  {
+    id: 4,
+    title: 'Що нового у Vue 3',
+    slug: 'iag-1',
+    excerpt: 'Розбираємо нові можливості фреймворку та best practices.',
+    category: 'Новини',
+    category_slug: 'news',
+    date: '23 грудня 2025',
+    image: 'https://via.placeholder.com/400x250',
+  },
+  {
+    id: 5,
+    title: 'Що нового у Vue 3',
+    slug: 'iag-1',
+    excerpt: 'Розбираємо нові можливості фреймворку та best practices.',
+    category: 'Новини',
+    category_slug: 'news',
+    date: '23 грудня 2025',
+    image: 'https://via.placeholder.com/400x250',
+  },
+  {
+    id: 6,
+    title: 'Що нового у Vue 3',
+    slug: 'iag-1',
+    excerpt: 'Розбираємо нові можливості фреймворку та best practices.',
+    category: 'Новини',
+    category_slug: 'news',
+    date: '23 грудня 2025',
+    image: 'https://via.placeholder.com/400x250',
+  },
 ])
 
 const totalPages = computed(() => Math.ceil(blogs.value.length / perPage))
@@ -259,7 +299,7 @@ const totalPages = computed(() => Math.ceil(blogs.value.length / perPage))
 }
 
 .read-more {
-  font-size: 16px;
+  font-size: 20px;
   color: #007bff;
   text-decoration: none;
   margin-top: 16px;
