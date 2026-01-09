@@ -150,6 +150,36 @@ const blogs = ref([
     date: '23 грудня 2025',
     image: 'https://via.placeholder.com/400x250',
   },
+  {
+    id: 7,
+    title: 'Що нового у Vue 3',
+    slug: 'iag-1',
+    excerpt: 'Розбираємо нові можливості фреймворку та best practices.',
+    category: 'Новини',
+    category_slug: 'news',
+    date: '23 грудня 2025',
+    image: 'https://via.placeholder.com/400x250',
+  },
+  {
+    id: 8,
+    title: 'Що нового у Vue 3',
+    slug: 'iag-1',
+    excerpt: 'Розбираємо нові можливості фреймворку та best practices.',
+    category: 'Новини',
+    category_slug: 'news',
+    date: '23 грудня 2025',
+    image: 'https://via.placeholder.com/400x250',
+  },
+  {
+    id: 9,
+    title: 'Що нового у Vue 3',
+    slug: 'iag-1',
+    excerpt: 'Розбираємо нові можливості фреймворку та best practices.',
+    category: 'Новини',
+    category_slug: 'news',
+    date: '23 грудня 2025',
+    image: 'https://via.placeholder.com/400x250',
+  },
 ])
 
 const totalPages = computed(() => Math.ceil(blogs.value.length / perPage))
