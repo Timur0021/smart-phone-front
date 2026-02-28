@@ -12,8 +12,8 @@
         <button
             v-for="category in categories"
             :key="category.id"
-            :class="['category-tag', { active: activeCategory === category.id }]"
-            @click="activeCategory = category.id"
+            :class="['category-tag', { active: activeCategory === category.slug }]"
+            @click="activeCategory = category.slug"
         >
           {{ category.name }}
         </button>
@@ -25,7 +25,13 @@
         <img :src="blog.image" alt="" />
         <div class="content">
           <div class="badge-date">
-            <span class="category-badge" :class="`cat-${blog.category_slug}`">{{ blog.category }}</span>
+            <span
+                class="category-badge"
+                :class="`cat-${blog.category_slug}`"
+                :style="{ backgroundColor: blog.category_color }"
+            >
+              {{ blog.category }}
+            </span>
             <span class="blog-date">{{ blog.date }}</span>
           </div>
           <h3 class="blog-card-title">{{ blog.title }}</h3>
@@ -38,14 +44,14 @@
     <div class="pagination">
       <button
           class="arrow"
-          :disabled="page === 1"
+          :disabled="page === 1 || loading"
           @click="page--"
       >
         ‹
       </button>
 
       <button
-          v-for="pageNumber in totalPages"
+          v-for="pageNumber in pageNumbers"
           :key="pageNumber"
           :class="['page-number', { active: pageNumber === page }]"
           @click="page = pageNumber"
@@ -55,7 +61,7 @@
 
       <button
           class="arrow"
-          :disabled="page === totalPages"
+          :disabled="page === totalPages || loading"
           @click="page++"
       >
         ›
@@ -65,129 +71,118 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { apolloClient } from '@/graphql/apolloClient'
+import { GET_BLOGS } from '@/graphql/queries/blogs/blogs'
+import { useToast } from 'vue-toastification'
 
-const activeCategory = ref<number>(1)
+interface BlogCategory {
+  name: string
+  slug: string
+  color: string
+  active: boolean
+}
+
+interface Blog {
+  name: string
+  slug: string
+  image: string
+  description: string
+  short_description?: string
+  published_at: string
+  category: BlogCategory
+}
+
+interface BlogsResponse {
+  blogs: {
+    data: Blog[]
+    filters: { id: number; name: string; slug: string }[]
+    pagination: {
+      currentPage: number
+      firstItem: number
+      lastItem: number
+      lastPage: number
+      total: number
+    }
+  }
+}
+
+const toast = useToast()
+
+const blogs = ref<any[]>([])
+const categories = ref<any[]>([])
+const activeCategory = ref<string | null>(null)
 const page = ref(1)
-const perPage = 1
+const perPage = 10
+const totalPages = ref(1)
+const loading = ref(false)
 
-const categories = ref([
-  { id: 1, name: 'Всі статті' },
-  { id: 2, name: 'Новини' },
-  { id: 3, name: 'Аналітика' },
-  { id: 4, name: 'Огляди' },
-  { id: 5, name: 'Гіди' },
-])
+const truncate = (text: string, maxLength: number) => {
+  if (!text) return ''
+  return text.length > maxLength ? text.slice(0, maxLength) + '...' : text
+}
 
-const blogs = ref([
-  {
-    id: 1,
-    title: 'Як правильно писати блог',
-    slug: 'iag-1',
-    excerpt: 'Короткий опис статті у 2–3 рядки, який зацікавлює читача.',
-    category: 'Гіди',
-    category_slug: 'guides',
-    date: '25 грудня 2025',
-    image: '../../src/assets/3.jpg',
-  },
-  {
-    id: 2,
-    title: 'Нові тренди 2025',
-    slug: 'iag-1',
-    excerpt: 'Огляд ключових трендів цього року та їх впливу на бізнес.',
-    category: 'Аналітика',
-    category_slug: 'analytics',
-    date: '24 грудня 2025',
-    image: 'https://via.placeholder.com/400x250',
-  },
-  {
-    id: 3,
-    title: 'Що нового у Vue 3',
-    slug: 'iag-1',
-    excerpt: 'Розбираємо нові можливості фреймворку та best practices.',
-    category: 'Новини',
-    category_slug: 'news',
-    date: '23 грудня 2025',
-    image: 'https://via.placeholder.com/400x250',
-  },
-  {
-    id: 3,
-    title: 'Що нового у Vue 3',
-    slug: 'iag-1',
-    excerpt: 'Розбираємо нові можливості фреймворку та best practices.',
-    category: 'Новини',
-    category_slug: 'news',
-    date: '23 грудня 2025',
-    image: 'https://via.placeholder.com/400x250',
-  },
-  {
-    id: 4,
-    title: 'Що нового у Vue 3',
-    slug: 'iag-1',
-    excerpt: 'Розбираємо нові можливості фреймворку та best practices.',
-    category: 'Новини',
-    category_slug: 'news',
-    date: '23 грудня 2025',
-    image: 'https://via.placeholder.com/400x250',
-  },
-  {
-    id: 5,
-    title: 'Що нового у Vue 3',
-    slug: 'iag-1',
-    excerpt: 'Розбираємо нові можливості фреймворку та best practices.',
-    category: 'Новини',
-    category_slug: 'news',
-    date: '23 грудня 2025',
-    image: 'https://via.placeholder.com/400x250',
-  },
-  {
-    id: 6,
-    title: 'Що нового у Vue 3',
-    slug: 'iag-1',
-    excerpt: 'Розбираємо нові можливості фреймворку та best practices.',
-    category: 'Новини',
-    category_slug: 'news',
-    date: '23 грудня 2025',
-    image: 'https://via.placeholder.com/400x250',
-  },
-  {
-    id: 7,
-    title: 'Що нового у Vue 3',
-    slug: 'iag-1',
-    excerpt: 'Розбираємо нові можливості фреймворку та best practices.',
-    category: 'Новини',
-    category_slug: 'news',
-    date: '23 грудня 2025',
-    image: 'https://via.placeholder.com/400x250',
-  },
-  {
-    id: 8,
-    title: 'Що нового у Vue 3',
-    slug: 'iag-1',
-    excerpt: 'Розбираємо нові можливості фреймворку та best practices.',
-    category: 'Новини',
-    category_slug: 'news',
-    date: '23 грудня 2025',
-    image: 'https://via.placeholder.com/400x250',
-  },
-  {
-    id: 9,
-    title: 'Що нового у Vue 3',
-    slug: 'iag-1',
-    excerpt: 'Розбираємо нові можливості фреймворку та best practices.',
-    category: 'Новини',
-    category_slug: 'news',
-    date: '23 грудня 2025',
-    image: 'https://via.placeholder.com/400x250',
-  },
-])
+const pageNumbers = computed(() => {
+  const pages = Math.max(totalPages.value, 1)
+  return Array.from({ length: pages }, (_, i) => i + 1)
+})
 
-const totalPages = computed(() => Math.ceil(blogs.value.length / perPage))
+const fetchBlogs = async () => {
+  loading.value = true
+  try {
+    const result = await apolloClient.query<BlogsResponse>({
+      query: GET_BLOGS,
+      variables: {
+        page: page.value,
+        limit: perPage,
+        category_slug: activeCategory.value,
+      },
+      fetchPolicy: 'no-cache',
+    })
+
+    if (!result.data || !result.data.blogs) {
+      toast.error('Дані не отримано')
+      return
+    }
+
+    blogs.value = result.data.blogs.data.map((b) => ({
+      id: b.slug,
+      title: b.name,
+      slug: b.slug,
+      excerpt: truncate(b.short_description || b.description || '', 120),
+      image: b.image || '',
+      category: b.category?.name || '',
+      category_slug: b.category?.slug || '',
+      category_color: b.category?.color || '#2563eb',
+      date: new Date(b.published_at).toLocaleDateString('uk-UA', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }),
+    }))
+
+    categories.value = [
+      { id: null, name: 'Всі статті', slug: null },
+      ...(result.data.blogs.filters ?? []),
+    ]
+
+    totalPages.value = result.data.blogs.pagination.lastPage
+  } catch (e: any) {
+    console.error(e)
+    toast.error(`Помилка завантаження блогів: ${e.message || e}`)
+  } finally {
+    loading.value = false
+  }
+}
+
+watch([page, activeCategory], fetchBlogs, { immediate: true })
+
+const paginatedBlogs = computed(() => blogs.value)
 </script>
 
 <style scoped>
 .blogs-page {
-  max-width: 105rem;
+  max-width: 80rem;
   margin: 0 auto;
   padding: 32px 32px;
 }
@@ -397,7 +392,7 @@ const totalPages = computed(() => Math.ceil(blogs.value.length / perPage))
 
 @media (min-width: 2560px) {
   .blogs-page {
-    max-width: 125rem;
+    max-width: 110rem;
     margin: 0 auto;
     padding: 32px 32px;
   }
