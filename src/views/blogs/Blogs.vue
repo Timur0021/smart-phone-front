@@ -36,7 +36,7 @@
           </div>
           <h3 class="blog-card-title">{{ blog.title }}</h3>
           <p class="blog-card-excerpt">{{ blog.excerpt }}</p>
-          <router-link :to="`/blog/${blog.slug}`" class="read-more">Читати більше</router-link>
+          <router-link :to="`/blogs/${blog.slug}`" class="read-more">Читати більше</router-link>
         </div>
       </article>
     </div>
