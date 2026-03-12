@@ -52,9 +52,10 @@
 
       <button
           v-for="pageNumber in pageNumbers"
-          :key="pageNumber"
+          :key="pageNumber + ''"
           :class="['page-number', { active: pageNumber === page }]"
-          @click="page = pageNumber"
+          :disabled="pageNumber === '...'"
+          @click="typeof pageNumber === 'number' && (page = pageNumber)"
       >
         {{ pageNumber }}
       </button>
@@ -113,7 +114,7 @@ const blogs = ref<any[]>([])
 const categories = ref<any[]>([])
 const activeCategory = ref<string | null>(null)
 const page = ref(1)
-const perPage = 10
+const perPage = 12
 const totalPages = ref(1)
 const loading = ref(false)
 
@@ -123,8 +124,35 @@ const truncate = (text: string, maxLength: number) => {
 }
 
 const pageNumbers = computed(() => {
-  const pages = Math.max(totalPages.value, 1)
-  return Array.from({ length: pages }, (_, i) => i + 1)
+  const total = totalPages.value
+  const current = page.value
+
+  if (total <= 5) {
+    return Array.from({ length: total }, (_, i) => i + 1)
+  }
+
+  const pages: (number | string)[] = []
+
+  pages.push(1)
+
+  if (current > 3) {
+    pages.push('...')
+  }
+
+  const start = Math.max(2, current - 1)
+  const end = Math.min(total - 1, current + 1)
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i)
+  }
+
+  if (current < total - 2) {
+    pages.push('...')
+  }
+
+  pages.push(total)
+
+  return pages
 })
 
 const fetchBlogs = async () => {
@@ -182,7 +210,7 @@ const paginatedBlogs = computed(() => blogs.value)
 
 <style scoped>
 .blogs-page {
-  max-width: 80rem;
+  max-width: 90rem;
   margin: 0 auto;
   padding: 32px 32px;
 }
@@ -250,7 +278,7 @@ const paginatedBlogs = computed(() => blogs.value)
 
 .blogs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 32px;
 }
 
@@ -339,21 +367,22 @@ const paginatedBlogs = computed(() => blogs.value)
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
 .page-number {
-  width: 40px;
-  height: 40px;
+  width: 56px;
+  height: 56px;
   background: #fff;
   border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .page-number:hover {
@@ -364,21 +393,22 @@ const paginatedBlogs = computed(() => blogs.value)
   background: #007bff;
   color: #fff;
   border-color: #007bff;
+  font-weight: 600;
 }
 
 .arrow {
-  width: 40px;
-  height: 40px;
+  width: 56px;
+  height: 56px;
   background: #007bff;
   color: #fff;
   border: none;
-  border-radius: 8px;
-  font-size: 20px;
+  border-radius: 12px;
+  font-size: 24px;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .arrow:disabled {
@@ -392,9 +422,15 @@ const paginatedBlogs = computed(() => blogs.value)
 
 @media (min-width: 2560px) {
   .blogs-page {
-    max-width: 110rem;
+    max-width: 130rem;
     margin: 0 auto;
     padding: 32px 32px;
+  }
+
+  .blogs-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
   }
 }
 </style>
