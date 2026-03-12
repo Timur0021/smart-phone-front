@@ -5,32 +5,36 @@
       <span class="separator">/</span>
       <router-link to="/blogs" class="crumb">Блог</router-link>
       <span class="separator">/</span>
-      <span class="current">{{ blog.title }}</span>
+      <span class="current">{{ blog?.name }}</span>
     </nav>
 
     <div class="blog-wrapper">
       <div class="blog-main">
         <div class="blog-card">
-          <h1 class="blog-title">{{ blog.title }}</h1>
+          <h1 class="blog-title">{{ blog?.name }}</h1>
           <div class="meta">
-            <span class="category-badge" :class="`cat-${blog.category_slug}`">{{ blog.category }}</span>
-            <span class="blog-date">{{ blog.date }}</span>
+           <span
+               class="category-badge"
+               :class="`cat-${blog?.category.slug}`"
+               :style="{ backgroundColor: blog?.category.color }"
+           >
+              {{ blog?.category.name }}
+           </span>
+            <span class="blog-date">{{ formattedDate }}</span>
           </div>
-          <img :src="blog.image" alt="" class="blog-image" />
-          <article class="blog-content">
-            <p v-for="(paragraph, idx) in blog.content" :key="idx" class="blog-paragraph">
-              {{ paragraph }}
-            </p>
-          </article>
+          <img :src="blog?.image" alt="" class="blog-image" />
+          <article class="blog-content" v-html="blogHtmlWithIds"></article>
         </div>
         <router-link to="/blogs" class="back-link">← Повернутись до блогу</router-link>
       </div>
 
-      <aside class="blog-sidebar">
+      <aside class="blog-sidebar" v-if="blog">
         <h2>Зміст</h2>
         <ul>
-          <li v-for="(section, idx) in blog.content" :key="idx">
-            <span class="section-number">{{ idx + 1 }}.</span> Розділ {{ idx + 1 }}
+          <li v-for="section in blogSections" :key="section.id">
+            <a href="javascript:void(0)" @click="scrollToSection(section.id)">
+              {{ section.text }}
+            </a>
           </li>
         </ul>
       </aside>
@@ -38,25 +42,100 @@
   </section>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
+<<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { apolloClient } from '@/graphql/apolloClient'
+import { BLOG } from "@/graphql/queries/blogs/blog.ts";
+import { useToast } from 'vue-toastification'
+import type { DocumentNode } from 'graphql'
+
+interface BlogCategory {
+  name: string
+  slug: string
+  color: string
+  active: boolean
+}
+
+interface BlogType {
+  name: string
+  slug: string
+  image: string
+  description: string
+  short_description?: string
+  published_at: string
+  category: BlogCategory
+}
+
+interface BlogQueryResult {
+  blog: BlogType
+}
 
 const route = useRoute()
-const blogId = route.params.id
+const toast = useToast()
+const slug = route.params.slug as string
+const blog = ref<BlogType | null>(null)
 
-const blog = ref({
-  id: blogId,
-  title: 'Як правильно писати блог',
-  category: 'Гіди',
-  category_slug: 'guides',
-  date: '25 грудня 2025',
-  image: '../../src/assets/3.jpg',
-  content: [
-    'Перший абзац статті з основним вступом.',
-    'Другий абзац із більш детальним описом і прикладами.',
-    'Третій абзац з висновками та порадами для читача.',
-  ],
+const formattedDate = computed(() => {
+  if (!blog.value) return ''
+  const d = new Date(blog.value.published_at)
+  return d.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
+})
+
+const blogSections = computed(() => {
+  if (!blog.value) return []
+
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(blog.value.description, 'text/html')
+
+  const headers = Array.from(doc.querySelectorAll('h1, h2, h3, strong'))
+
+  return headers.map((el, idx) => ({
+    text: el.textContent || `Розділ ${idx + 1}`,
+    id: `section-${idx + 1}`
+  }))
+})
+
+const blogHtmlWithIds = computed(() => {
+  if (!blog.value) return ''
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(blog.value.description, 'text/html')
+
+  const headers = doc.querySelectorAll('h1, h2, h3, strong')
+  headers.forEach((el, idx) => el.setAttribute('id', `section-${idx + 1}`))
+
+  return doc.body.innerHTML
+})
+
+const scrollToSection = (id: string) => {
+  const el = document.getElementById(id)
+  if (el) {
+    const yOffset = -20
+    const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset
+    window.scrollTo({ top: y, behavior: 'smooth' })
+  }
+}
+
+const fetchBlog = async () => {
+  try {
+    const result = await apolloClient.query<BlogQueryResult>({
+      query: BLOG as DocumentNode,
+      variables: { slug }
+    })
+
+    if (result.data?.blog) {
+      blog.value = result.data.blog
+    } else {
+      toast.error('Блог не знайдено')
+    }
+  } catch (e: any) {
+    toast.error(`Помилка завантаження блогів: ${e.message || e}`)
+    console.error(e)
+  }
+}
+
+onMounted(() => {
+  fetchBlog()
 })
 </script>
 
@@ -122,13 +201,10 @@ const blog = ref({
   color: #fff;
 }
 
-.cat-news { background: #2563eb; }
-.cat-analytics { background: #7c3aed; }
-.cat-guides { background: #059669; }
-
 .blog-date {
   font-size: 25px;
   color: #666;
+  margin-left: auto;
 }
 
 .blog-image {
@@ -191,10 +267,14 @@ const blog = ref({
   border-bottom: 1px solid #eee;
 }
 
-.section-number {
+.blog-sidebar li a {
+  color: #000;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.blog-sidebar li a:hover {
   color: #007bff;
-  font-weight: 600;
-  margin-right: 6px;
 }
 
 @media (min-width: 2560px) {
