@@ -34,9 +34,7 @@
         </div>
       </div>
 
-
       <div class="right">
-
         <h2>Виникли питання? Напишіть нам</h2>
 
         <p class="text">
@@ -49,10 +47,18 @@
 
         <div class="social">
           <p class="label">Соціальні мережі:</p>
-
           <div class="icons">
-            <div class="circle">f</div>
-            <div class="circle">in</div>
+            <a href="https://facebook.com" target="_blank" class="icon-link">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#1877F2" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22 12C22 6.48 17.52 2 12 2S2 6.48 2 12c0 5 3.66 9.13 8.44 9.88v-6.99H7.9v-2.89h2.54V9.83c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.45h-1.25c-1.23 0-1.61.77-1.61 1.56v1.87h2.74l-.44 2.89h-2.3v6.99C18.34 21.13 22 17 22 12z"/>
+              </svg>
+            </a>
+
+            <a href="https://instagram.com" target="_blank" class="icon-link">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#E1306C" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 2C4.238 2 2 4.238 2 7v10c0 2.762 2.238 5 5 5h10c2.762 0 5-2.238 5-5V7c0-2.762-2.238-5-5-5H7zm10 1.5c1.379 0 2.5 1.121 2.5 2.5v10c0 1.379-1.121 2.5-2.5 2.5H7c-1.379 0-2.5-1.121-2.5-2.5V6c0-1.379 1.121-2.5 2.5-2.5h10zM12 7a5 5 0 100 10 5 5 0 000-10zm0 1.5a3.5 3.5 0 110 7 3.5 3.5 0 010-7zm4.75-2.25a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z"/>
+              </svg>
+            </a>
           </div>
         </div>
       </div>
@@ -124,45 +130,73 @@ import Breadcrumbs from "@/views/Breadcrumbs.vue";
   margin-top: 10px;
 }
 
-.circle {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #e5e5e5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-}
-
 .right {
   width: 700px;
-  background: #f7f7f7;
-  padding: 60px;
+  background: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)),
+  url('src/assets/caracter-empresarial-confuso-que-toma-decision-importante_74855-20080.avif') no-repeat center center;
+  background-size: cover;
+  padding: 20px 60px 60px 60px;
   border-radius: 6px;
+  color: black;
+  position: relative;
 }
 
 .right h2 {
-  font-size: 22px;
-  margin-bottom: 10px;
+  font-size: 50px;
+  font-weight: 700;
+  margin: 0 0 30px 0;
+  padding: 0;
 }
 
-.text {
-  margin-bottom: 30px;
+.right .text {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 50px 0;
 }
 
 .btn {
   background: #1e73ff;
   color: white;
   border: none;
-  padding: 14px 24px;
-  font-size: 16px;
+  padding: 21px 36px;
+  font-size: 24px;
   border-radius: 4px;
   cursor: pointer;
 }
 
+
 .btn:hover {
   background: #0f5fe0;
+}
+
+.right .social {
+  position: absolute;
+  bottom: 20px;
+  left: 60px;
+  display: block;
+}
+
+.right .social .label {
+  margin-bottom: 25px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.right .social .icons {
+  display: flex;
+  gap: 15px;
+}
+
+.right .social .icons a svg {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #e5e5e5;
+  padding: 6px;
+}
+
+.right .social .icons a:hover svg {
+  background: #adc3f5;
 }
 
 @media (min-width: 2560px) {
@@ -176,7 +210,7 @@ import Breadcrumbs from "@/views/Breadcrumbs.vue";
   }
   .left,
   .right {
-    width: 745px;
+    width: 700px;
   }
 }
 </style>
