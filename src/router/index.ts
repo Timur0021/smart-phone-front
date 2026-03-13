@@ -25,6 +25,12 @@ const routes = [
         props: true,
     },
     {
+        path: '/:lang(en)?/kontakti',
+        name: 'contact',
+        component: () => import('../views/Contact.vue'),
+        props: true,
+    },
+    {
         path: '/about',
         name: 'about',
         component: () => import('../views/AboutView.vue'),
