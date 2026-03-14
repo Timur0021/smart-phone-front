@@ -61,6 +61,17 @@
 
               <input type="email" placeholder="Email">
 
+              <div class="rating">
+                <StarRatings
+                    v-model="rating"
+                    :numberOfStars="5"
+                    :starSize="50"
+                    :step="0.5"
+                    starColor="#f5a623"
+                    inactiveColor="#ccc"
+                />
+              </div>
+
               <textarea placeholder="Повідомлення"></textarea>
 
               <button type="submit" class="send">
@@ -92,10 +103,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import Breadcrumbs from "@/views/Breadcrumbs.vue";
+import StarRatings from "vue3-star-ratings";
+
 
 const showPopup = ref(false);
+const rating = ref(0);
+
+watch(rating, (val) => {
+  rating.value = Math.round(val * 2) / 2
+})
 </script>
 
 <style scoped>
@@ -298,6 +316,12 @@ textarea {
 
 .send:hover {
   background: #0f5fe0;
+}
+
+.rating {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0 5px 0;
 }
 
 @media (min-width: 2560px) {
