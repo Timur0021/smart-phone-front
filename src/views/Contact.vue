@@ -41,9 +41,38 @@
           Залиште своє повідомлення, і ми відповімо якнайшвидше
         </p>
 
-        <button class="btn">
+        <button class="btn" @click="showPopup = true">
           Написати
         </button>
+
+        <div v-if="showPopup" class="popup">
+          <div class="popup-overlay" @click="showPopup = false"></div>
+
+          <div class="popup-box">
+
+            <button class="close" @click="showPopup = false">×</button>
+
+            <h2>Напишіть нам</h2>
+
+            <form class="form">
+
+              <div class="row">
+                <input type="text" placeholder="Ім'я">
+                <input type="text" placeholder="Телефон">
+              </div>
+
+              <input type="email" placeholder="Email">
+
+              <textarea placeholder="Повідомлення"></textarea>
+
+              <button type="submit" class="send">
+                Відправити
+              </button>
+
+            </form>
+
+          </div>
+        </div>
 
         <div class="social">
           <p class="label">Соціальні мережі:</p>
@@ -67,7 +96,10 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import Breadcrumbs from "@/views/Breadcrumbs.vue";
+
+const showPopup = ref(false);
 </script>
 
 <style scoped>
@@ -199,6 +231,79 @@ import Breadcrumbs from "@/views/Breadcrumbs.vue";
   background: #adc3f5;
 }
 
+.popup {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+.popup-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+}
+
+.popup-box {
+  position: relative;
+  width: 500px;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  margin: 100px auto;
+  z-index: 2;
+}
+
+.close {
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  font-size: 28px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+.row input {
+  width: 100%;
+}
+
+input,
+textarea {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+}
+
+textarea {
+  min-height: 120px;
+  resize: none;
+}
+
+.send {
+  background: #1e73ff;
+  color: white;
+  border: none;
+  padding: 14px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.send:hover {
+  background: #0f5fe0;
+}
+
 @media (min-width: 2560px) {
   .title {
     font-size: 50px;
@@ -212,5 +317,20 @@ import Breadcrumbs from "@/views/Breadcrumbs.vue";
   .right {
     width: 700px;
   }
+
+  .form input,
+  .form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 19px;
+    font-size: 18px;
+    border: 1px solid #ccc;
+  }
+
+  textarea {
+    min-height: 120px;
+    resize: none;
+  }
+
 }
 </style>
