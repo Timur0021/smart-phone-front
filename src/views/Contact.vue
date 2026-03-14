@@ -49,13 +49,11 @@
           <div class="popup-overlay" @click="showPopup = false"></div>
 
           <div class="popup-box">
-
             <button class="close" @click="showPopup = false">×</button>
 
             <h2>Напишіть нам</h2>
 
             <form class="form">
-
               <div class="row">
                 <input type="text" placeholder="Ім'я">
                 <input type="text" placeholder="Телефон">
@@ -68,9 +66,7 @@
               <button type="submit" class="send">
                 Відправити
               </button>
-
             </form>
-
           </div>
         </div>
 
