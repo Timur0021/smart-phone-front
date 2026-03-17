@@ -123,7 +123,7 @@ const removeAvatar = async () => {
   if (!user.image_object?.id) return;
 
   try {
-    const res = await fetch('http://smart-phone.test/api/temporary-files', {
+    const res = await fetch('http://cyberon.test/api/temporary-files', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -156,7 +156,7 @@ const uploadTemporaryFile = async (file: File): Promise<number | null> => {
   formData.append('file', file);
 
   try {
-    const res = await fetch('http://smart-phone.test/api/temporary-files', {
+    const res = await fetch('http://cyberon.test/api/temporary-files', {
       method: 'POST',
       body: formData,
       credentials: 'include',
