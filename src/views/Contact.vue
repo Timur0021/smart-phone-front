@@ -62,6 +62,8 @@
               <input type="email" placeholder="Email">
 
               <div class="rating">
+                <label class="rating-label">Оцінка:</label>
+
                 <StarRatings
                     v-model="rating"
                     :numberOfStars="5"
@@ -320,8 +322,15 @@ textarea {
 
 .rating {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   margin: 10px 0 5px 0;
+}
+
+.rating-label {
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 5px;
 }
 
 @media (min-width: 2560px) {
