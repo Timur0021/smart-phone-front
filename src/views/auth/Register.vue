@@ -44,10 +44,6 @@
 
         <button type="submit" class="btn main-btn">Зареєструватися</button>
 
-        <button type="button" class="btn google-btn" @click="signInWithGoogle">
-          Зареєструватися через Google
-        </button>
-
         <p class="login-text">
           Вже є обліковий запис? <router-link :to="{name: 'login'}">увійти</router-link>
         </p>
