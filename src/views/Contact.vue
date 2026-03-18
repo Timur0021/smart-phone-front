@@ -2,34 +2,18 @@
   <div class="page">
     <Breadcrumbs title="Контакти" />
 
-    <h1 class="title">Контакти</h1>
+    <h1 class="title" v-if="blocks.length">
+      {{ getTitle(blocks[0] ?? { id: '', name: '', type: '', block: [] }) }}
+    </h1>
 
     <div class="content">
       <div class="left">
         <h2>Зв'яжіться з нами</h2>
 
         <div class="info">
-          <div class="item">
-            <p class="label">Телефон:</p>
-            <p>+380504741854</p>
-          </div>
-
-          <div class="item">
-            <p class="label">Email:</p>
-            <p>info@tea.ua</p>
-          </div>
-
-          <div class="item">
-            <p class="label">Фактична адреса:</p>
-            <p>
-              02100 Київська обл., м. Обухів,
-              вул. Трипільська, 46
-            </p>
-          </div>
-
-          <div class="item">
-            <p class="label">Графік роботи:</p>
-            <p>9:00-18:00; сб, нд-вихідні</p>
+          <div class="item" v-for="(item, index) in contacts" :key="index">
+            <p class="label">{{ item.label }}</p>
+            <p>{{ item.value }}</p>
           </div>
         </div>
       </div>
@@ -105,17 +89,106 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import Breadcrumbs from "@/views/Breadcrumbs.vue";
 import StarRatings from "vue3-star-ratings";
+import { apolloClient } from "@/graphql/apolloClient.ts";
+import { GET_PAGE } from "@/graphql/queries/page/page.ts";
+import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
 
 
 const showPopup = ref(false);
 const rating = ref(0);
+const blocks = ref<PageBlock[]>([]);
+const contacts = ref<{ label: string; value: string }[]>([]);
+
+interface BlockDataItem {
+  key: string;
+  type: string;
+  value?: any;
+  items?: BlockDataItem[];
+}
+
+interface BlockItem {
+  type: string;
+  data: BlockDataItem[];
+}
+
+interface PageBlock {
+  id: string;
+  name: string;
+  type: string;
+  block: BlockItem[];
+}
+
+onMounted(async () => {
+    try {
+      const { data: perData } = await apolloClient.query({
+        query: GET_PAGE,
+        variables: { slug: "kontakti" },
+      }) as any;
+
+      blocks.value = perData.page.blocks;
+
+      const { data } = await apolloClient.query({ query: GET_SETTINGS }) as any;
+      const settings = data.settings.settings;
+      const textInSite = data.settings.text_in_site;
+
+      if (blocks.value.length && blocks.value[0]) {
+        contacts.value = getContactsFromBlock(blocks.value[0], settings, textInSite);
+      }
+
+    } catch (e) {
+      console.error(e);
+    }
+})
 
 watch(rating, (val) => {
   rating.value = Math.round(val * 2) / 2
 })
+
+function getTitle(block: PageBlock) {
+  const titleBlock = block.block.find((b) => b.type === "title");
+
+  if (!titleBlock) return "";
+
+  const titleField = titleBlock.data.find((d) => d.key === "title");
+
+  return titleField?.value ?? "";
+}
+
+function getContactsFromBlock(block: PageBlock, settings: any[], textInSite: any[]) {
+  const listBlock = block.block.find(b => b.type === 'text_list');
+  if (!listBlock) return [];
+
+  const itemsField = listBlock.data.find(d => d.key === 'items');
+  if (!itemsField?.items) return [];
+
+  return itemsField.items.map((item: any) => {
+    const textField = item.data.find((d: any) => d.key === 'text_item');
+    const label = textField?.value ?? '';
+
+    let value = '';
+    const lowerLabel = label.toLowerCase();
+
+    const mapping: Record<string, () => string> = {
+      'телефон': () => settings.find(s => s.key === 'phone')?.value ?? '',
+      'email': () => settings.find(s => s.key === 'email')?.value ?? '',
+      'адреса': () => settings.find(s => s.key === 'address')?.value ?? '',
+      'графік': () => textInSite.find(t => t.key === 'working_hours')?.text ?? ''
+    };
+
+    for (const key in mapping) {
+      const fn = mapping[key];
+      if (lowerLabel.includes(key) && fn) {
+        value = fn();
+        break;
+      }
+    }
+
+    return { label, value };
+  });
+}
 </script>
 
 <style scoped>
