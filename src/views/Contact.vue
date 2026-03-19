@@ -37,13 +37,13 @@
 
             <h2>Напишіть нам</h2>
 
-            <form class="form">
+            <form class="form" @submit.prevent="sendFeedback">
               <div class="row">
-                <input type="text" placeholder="Ім'я">
-                <input type="text" placeholder="Телефон">
+                <input type="text" placeholder="Ім'я" v-model="firstName">
+                <input type="text" placeholder="Телефон" v-model="phone">
               </div>
 
-              <input type="email" placeholder="Email">
+              <input type="email" placeholder="Email" v-model="email">
 
               <div class="rating">
                 <label class="rating-label">Оцінка:</label>
@@ -58,10 +58,14 @@
                 />
               </div>
 
-              <textarea placeholder="Повідомлення"></textarea>
+              <textarea placeholder="Повідомлення" v-model="message"></textarea>
 
-              <button type="submit" class="send">
-                Відправити
+              <button
+                  type="submit"
+                  class="send"
+                  :disabled="sending"
+              >
+                {{ sending ? "Відправка..." : "Відправити" }}
               </button>
             </form>
           </div>
@@ -95,10 +99,19 @@ import StarRatings from "vue3-star-ratings";
 import { apolloClient } from "@/graphql/apolloClient.ts";
 import { GET_PAGE } from "@/graphql/queries/page/page.ts";
 import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
+import { CREATE_FEEDBACK } from "@/graphql/mutations/pages/feedback.ts";
+import { useToast } from "vue-toastification";
+
+const toast = useToast();
 
 
 const showPopup = ref(false);
 const rating = ref(0);
+const firstName = ref("");
+const phone = ref("");
+const email = ref("");
+const message = ref("");
+const sending = ref(false);
 const blocks = ref<PageBlock[]>([]);
 const contacts = ref<{ label: string; value: string }[]>([]);
 
@@ -121,6 +134,47 @@ interface PageBlock {
   block: BlockItem[];
 }
 
+const sendFeedback = async () => {
+  if (!firstName.value || !phone.value || !email.value || !message.value) {
+    toast.warning("Всі поля обов'язкові");
+    return;
+  }
+
+  try {
+    sending.value = true;
+
+    const { data } = await apolloClient.mutate({
+      mutation: CREATE_FEEDBACK,
+      variables: {
+        first_name: firstName.value,
+        phone: phone.value,
+        email: email.value,
+        mark: rating.value,
+        message: message.value,
+      }
+    });
+
+    if (data?.createFeedback?.status) {
+      toast.success("Повідомлення відправлено");
+    } else {
+      toast.error("Помилка відправки");
+    }
+
+    firstName.value = "";
+    phone.value = "";
+    email.value = "";
+    message.value = "";
+    rating.value = 0;
+
+    showPopup.value = false;
+  } catch (e) {
+    console.error(e);
+    toast.error("Сталася помилка при відправці")
+  } finally {
+    sending.value = false;
+  }
+}
+
 onMounted(async () => {
     try {
       const { data: perData } = await apolloClient.query({
@@ -137,9 +191,9 @@ onMounted(async () => {
       if (blocks.value.length && blocks.value[0]) {
         contacts.value = getContactsFromBlock(blocks.value[0], settings, textInSite);
       }
-
     } catch (e) {
       console.error(e);
+      toast.error("Сталася помилка при зєднані")
     }
 })
 
