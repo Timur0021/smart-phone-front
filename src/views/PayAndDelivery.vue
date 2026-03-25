@@ -1,91 +1,94 @@
 <template>
-  <div class="page">
-    <Breadcrumbs title="Оплата і доставка" />
+  <div class="page" v-if="page">
+    <Breadcrumbs :title="page.title" />
 
-    <h1 class="title">
-      Оплата і доставка
-    </h1>
+    <h1 class="title">{{ page.title }}</h1>
 
     <div class="content">
-      <div class="top">
-        <div class="box">
-          <h2>Способи оплати</h2>
+      <div class="top" v-if="topBlocks.length">
+        <div class="box" v-for="(block, index) in topBlocks" :key="index">
+          <h2 v-if="block.title">{{ block.title }}</h2>
 
-          <p class="subtitle withIcon">
-            <img src="@/assets/box.png" class="icon" alt=""/>
-            Оплата при отриманні товару
-          </p>
-
-          <p>
-            У відділенні "Нова Пошта" — готівковий / безготівковий розрахунок.<br>
-            У поштоматі "Нова Пошта" — безготівковий розрахунок.<br>
-            Кур'єром "Нова Пошта" — готівковий / безготівковий.
-          </p>
-
-          <p class="subtitle withIcon">
-            <img src="@/assets/Screenshot_20260319_222700.png" class="icon" alt=""/>
-            Онлайн оплата
-          </p>
-
-          <p>
-            Оплата на сайті банківською карткою Visa / MasterCard
-          </p>
-        </div>
-
-
-        <div class="box">
-          <h2>Доставка Нова пошта</h2>
-
-          <p class="subtitle withIcon">
-            <img src="@/assets/images.png" class="icon" alt=""/>
-            У відділення або поштомат
-          </p>
-
-          <p>
-            Термін доставки 2–3 дні<br>
-            Безкоштовно від 1000 грн
-          </p>
-
-          <p class="subtitle withIcon">
-            <img src="@/assets/images.png" class="icon" alt=""/>
-            Кур'єром
-          </p>
-
-          <p>
-            Адресна доставка кур'єром Нова пошта
-          </p>
+          <div v-for="item in block.items" :key="item.title">
+            <p class="subtitle withIcon" v-if="item.title">
+              <img :src="item.image" class="icon" alt="" />
+              {{ item.title }}
+            </p>
+            <p v-html="item.description"></p>
+            <p v-if="item.sub_title" class="subtitle">{{ item.sub_title }}</p>
+          </div>
         </div>
       </div>
 
-      <div class="bottom">
-        <h2>Умови обміну та повернення</h2>
-
-        <p>
-          Обмін або повернення можливий протягом 14 днів при збереженні товарного вигляду.
-        </p>
-
-        <p>
-          Гроші повертаються в день повернення або до 7 днів згідно закону України.
-        </p>
-
-        <p>
-          Повернення здійснюється тим самим способом оплати.
-        </p>
-
-        <p>
-          Деякі товари не підлягають поверненню згідно постанови №172.
-        </p>
+      <div class="bottom" v-if="bottomBlock">
+        <h2>{{ bottomBlock.title }}</h2>
+        <div v-for="paragraph in bottomBlock.paragraphs" :key="paragraph" v-html="paragraph"></div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from "vue";
 import Breadcrumbs from "@/views/Breadcrumbs.vue";
+import { apolloClient } from "@/graphql/apolloClient.ts";
+import { GET_PAGE } from "@/graphql/queries/page/page.ts";
+import { useToast } from "vue-toastification";
+
+const page = ref<any>(null);
+const topBlocks = ref<any[]>([]);
+const bottomBlock = ref<any>(null);
+
+const slug = "oplata-ta-dostavka";
+
+function parsePayAndDeliveryBlock(block: any) {
+  return block.block
+      .filter((b: any) => b.type === "pay_and_delivery")
+      .flatMap((b: any) => {
+        return b.data[0].items.map((list: any) => {
+          const titleItem = list.data.find((d: any) => d.key === "title");
+          const itemsData = list.data.find((d: any) => d.key === "items");
+          const items = itemsData.items.map((i: any) => {
+            const data = Object.fromEntries(i.data.map((d: any) => [d.key, d.value]));
+            return data;
+          });
+          return {
+            title: titleItem?.value,
+            items
+          };
+        });
+      });
+}
+
+function parseDescriptionEditor(block: any) {
+  const descBlock = block.block.find((b: any) => b.type === "description_editor");
+  if (!descBlock) return null;
+
+  const description = descBlock.data.find((d: any) => d.key === "description_editor")?.value;
+  const paragraphs = description.split("</p>").map((p: string) => p.replace("<p>", "").trim()).filter(Boolean);
+  return {
+    title: "Умови обміну та повернення",
+    paragraphs
+  };
+}
+
+onMounted(async () => {
+  try {
+    const { data } = await apolloClient.query({
+      query: GET_PAGE,
+      variables: { slug }
+    });
+    page.value = data.page;
+    topBlocks.value = parsePayAndDeliveryBlock(page.value.blocks[0]);
+    bottomBlock.value = parseDescriptionEditor(page.value.blocks[0]);
+  } catch (err) {
+    useToast().error("Помилка завантаження сторінки");
+    console.error(err);
+  }
+});
 </script>
 
 <style scoped>
-
 .page {
   padding: 20px 0;
   font-family: 'Helvetica Neue', Arial, sans-serif;

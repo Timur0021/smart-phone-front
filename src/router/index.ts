@@ -26,7 +26,7 @@ const routes = [
     },
     {
         path: '/:lang(en)?/oplata-ta-dostavka',
-        name: 'blog-single',
+        name: 'pay-and-delivery',
         component: () => import('../views/PayAndDelivery.vue'),
         props: true,
     },
