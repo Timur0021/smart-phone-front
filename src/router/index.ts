@@ -25,6 +25,12 @@ const routes = [
         props: true,
     },
     {
+        path: '/:lang(en)?/oplata-ta-dostavka',
+        name: 'blog-single',
+        component: () => import('../views/PayAndDelivery.vue'),
+        props: true,
+    },
+    {
         path: '/:lang(en)?/kontakti',
         name: 'contact',
         component: () => import('../views/Contact.vue'),
