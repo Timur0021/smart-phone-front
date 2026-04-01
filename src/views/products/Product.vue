@@ -80,7 +80,7 @@
           <div v-if="activeTab === 'reviews'">
             <div
                 class="review"
-                v-for="(review, index) in product.reviews"
+                v-for="(review, index) in paginatedReviews"
                 :key="index"
             >
               <div class="review-avatar">
@@ -109,6 +109,19 @@
                 </p>
               </div>
             </div>
+            <div class="pagination">
+              <button @click="prevPage" :disabled="currentPage === 1">
+                ← Назад
+              </button>
+
+              <span>
+                {{ currentPage }} / {{ totalPages }}
+              </span>
+
+              <button @click="nextPage" :disabled="currentPage === totalPages">
+                Вперед →
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -117,7 +130,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import Breadcrumbs from "@/views/Breadcrumbs.vue";
 
 const product = ref({
@@ -154,6 +167,62 @@ const product = ref({
       text: "Камера просто топ! Я був приємно здивований якістю фото навіть у складних умовах освітлення. Знімки виходять дуже чіткі, з правильними кольорами та чудовою деталізацією. Особливо сподобалось, як працює нічний режим — фотографії виглядають так, ніби зроблені професійною камерою. Відео також на високому рівні: стабілізація працює ідеально, немає тряски навіть під час руху. В цілому, це один із найкращих смартфонів, які я використовував, і камера тут реально одна з головних причин для покупки.",
       avatar: "https://i.pravatar.cc/100?img=32"
     },
+    {
+      name: "Андрій",
+      surname: "Мельник",
+      rating: 5,
+      text: "Телефон перевершив усі очікування. Дуже швидкий, нічого не зависає навіть при великому навантаженні. Камера реально топ — користуюсь кожного дня і завжди отримую класні фото. Батарея тримає довго, що для мене дуже важливо. Однозначно рекомендую!",
+      avatar: "https://i.pravatar.cc/100?img=21"
+    },
+    {
+      name: "Марія",
+      surname: "Шевченко",
+      rating: 5,
+      text: "Дуже стильний дизайн і приємно лежить у руці. Екран яскравий і плавний, користуватись одне задоволення. Особливо подобається якість відео — знімаю блоги і різниця з попереднім телефоном колосальна.",
+      avatar: "https://i.pravatar.cc/100?img=45"
+    },
+    {
+      name: "Олександр",
+      surname: "Кравець",
+      rating: 4,
+      text: "Загалом дуже хороший смартфон. Потужний процесор, швидка робота системи, якісні матеріали. Єдине — ціна трохи висока, але воно того варте.",
+      avatar: "https://i.pravatar.cc/100?img=33"
+    },
+    {
+      name: "Ірина",
+      surname: "Ткаченко",
+      rating: 5,
+      text: "Користуюсь вже місяць і дуже задоволена. Особливо подобається камера — фото виходять як з професійної камери. Також сподобалась автономність, заряд тримає цілий день без проблем.",
+      avatar: "https://i.pravatar.cc/100?img=28"
+    },
+    {
+      name: "Дмитро",
+      surname: "Сидоренко",
+      rating: 4,
+      text: "Дуже швидкий телефон, все працює без лагів. Ігри йдуть ідеально. Камера хороша, але очікував трохи більшого нічного режиму. В цілому задоволений покупкою.",
+      avatar: "https://i.pravatar.cc/100?img=14"
+    },
+    {
+      name: "Наталія",
+      surname: "Гончар",
+      rating: 5,
+      text: "Це найкращий телефон, який у мене був. Дуже гарний дисплей, плавна анімація, зручний інтерфейс. Камера — просто космос, особливо портретний режим.",
+      avatar: "https://i.pravatar.cc/100?img=47"
+    },
+    {
+      name: "Віталій",
+      surname: "Бондаренко",
+      rating: 4,
+      text: "Хороший апарат для роботи і розваг. Використовую для фото, відео та роботи — справляється з усім. Трохи дорогий, але якість відповідає ціні.",
+      avatar: "https://i.pravatar.cc/100?img=19"
+    },
+    {
+      name: "Світлана",
+      surname: "Клименко",
+      rating: 5,
+      text: "Дуже задоволена покупкою. Камера, швидкість, дизайн — все на найвищому рівні. Особливо сподобалась стабілізація відео — знімаю дітей і все виходить дуже плавно.",
+      avatar: "https://i.pravatar.cc/100?img=50"
+    }
   ],
 });
 
@@ -165,6 +234,26 @@ const setImage = (img: string) => {
 
 const getStars = (rating: number) => {
   return Array.from({ length: 5 }, (_, i) => i < rating);
+};
+
+const currentPage = ref(1);
+const perPage = 5;
+
+const paginatedReviews = computed(() => {
+  const start = (currentPage.value - 1) * perPage;
+  return product.value.reviews.slice(start, start + perPage);
+});
+
+const totalPages = computed(() => {
+  return Math.ceil(product.value.reviews.length / perPage);
+});
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) currentPage.value++;
+};
+
+const prevPage = () => {
+  if (currentPage.value > 1) currentPage.value--;
 };
 
 onMounted(() => {
@@ -215,7 +304,7 @@ const discountPercent = (price: number, oldPrice: number) => {
 
 .gallery {
   width: 100%;
-  transform: translateX(-45px);
+  margin-left: 4rem
 }
 
 .main-image {
@@ -335,7 +424,7 @@ const discountPercent = (price: number, oldPrice: number) => {
 
 .tabs {
   margin-top: 40px;
-  margin-left: -40px;
+  margin-left: 60px;
 }
 
 .tab-headers {
@@ -484,9 +573,38 @@ const discountPercent = (price: number, oldPrice: number) => {
   font-size: 20px;
   line-height: 1.8;
 }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+  margin-top: 40px;
+}
+
+.pagination button {
+  padding: 12px 22px;
+  border-radius: 10px;
+  border: none;
+  background: #2563EB;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+.pagination button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-size: 18px;
+  font-weight: 600;
+}
 @media (min-width: 2560px) {
   .gallery {
-    transform: translateX(-110px);
+    margin-left: 5rem
   }
 
   .thumbnails {
@@ -515,7 +633,7 @@ const discountPercent = (price: number, oldPrice: number) => {
 
   .tabs {
     margin-top: 40px;
-    margin-left: -120px;
+    margin-left: 40px;
   }
 }
 </style>
