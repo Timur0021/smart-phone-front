@@ -56,6 +56,11 @@ const routes = [
         name: 'dashboard',
         component: () => import('../views/dashboard/Dashboard.vue'),
     },
+    {
+        path: '/:lang(en)?/product',
+        name: 'dashboard',
+        component: () => import('../views/products/Product.vue'),
+    },
 ]
 
 const router = createRouter({

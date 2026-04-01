@@ -1,0 +1,521 @@
+<template>
+  <div class="product-page">
+    <Breadcrumbs title="Товар" />
+
+    <div class="container">
+      <div class="product">
+        <div class="gallery">
+          <div class="main-image">
+            <img :src="activeImage" alt="product" />
+          </div>
+
+          <div class="thumbnails">
+            <div
+                v-for="(img, index) in product.images"
+                :key="index"
+                class="thumb"
+                :class="{ active: img === activeImage }"
+                @click="setImage(img)"
+            >
+              <img :src="img" />
+            </div>
+          </div>
+        </div>
+
+        <div class="info">
+          <h1 class="title">{{ product.title }}</h1>
+
+          <div class="price-block">
+            <div class="prices">
+              <span class="current">₴ {{ product.price }}</span>
+
+              <span class="old" v-if="product.oldPrice">
+                ₴ {{ product.oldPrice }}
+              </span>
+            </div>
+
+            <div class="discount" v-if="product.oldPrice">
+              -{{ discountPercent(product.price, product.oldPrice) }}%
+            </div>
+          </div>
+
+          <p class="description">
+            {{ product.description }}
+          </p>
+
+          <button class="buy-btn">Купити</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab-headers">
+          <button
+              :class="{ active: activeTab === 'chars' }"
+              @click="activeTab = 'chars'"
+          >
+            Характеристики
+          </button>
+
+          <button
+              :class="{ active: activeTab === 'reviews' }"
+              @click="activeTab = 'reviews'"
+          >
+            Відгуки
+          </button>
+        </div>
+
+        <div class="tab-content" :class="{ 'tab-content--plain': activeTab === 'reviews' }">
+          <div v-if="activeTab === 'chars'">
+            <table class="chars">
+              <tr
+                  v-for="(item, index) in product.characteristics"
+                  :key="index"
+              >
+                <td>{{ item.name }}</td>
+                <td>{{ item.value }}</td>
+              </tr>
+            </table>
+          </div>
+
+          <div v-if="activeTab === 'reviews'">
+            <div
+                class="review"
+                v-for="(review, index) in product.reviews"
+                :key="index"
+            >
+              <div class="review-avatar">
+                <img :src="review.avatar" alt="avatar" />
+              </div>
+
+              <div class="review-body">
+                <div class="review-header">
+                  <div class="review-name">
+                    {{ review.name }} {{ review.surname }}
+                  </div>
+
+                  <div class="review-rating">
+                    <span
+                        v-for="(star, i) in getStars(review.rating)"
+                        :key="i"
+                        class="star"
+                    >
+                      ★
+                    </span>
+                  </div>
+                </div>
+
+                <p class="review-text">
+                  {{ review.text }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from "vue";
+import Breadcrumbs from "@/views/Breadcrumbs.vue";
+
+const product = ref({
+  title: "iPhone 15 Pro Max 256GB",
+  price: 58999,
+  oldPrice: 69999,
+  description:
+      "Новий iPhone з титановим корпусом, потужним процесором та топовою камерою.",
+  images: [
+    "https://images.unsplash.com/photo-1518773553398-650c184e0bb3",
+    "https://images.unsplash.com/photo-1518773553398-650c184e0bb3",
+    "https://images.unsplash.com/photo-1509395176047-4a66953fd231",
+    "https://images.unsplash.com/photo-1517433456452-f9633a875f6f",
+    "https://images.unsplash.com/photo-1509395176047-4a66953fd231",
+  ],
+  characteristics: [
+    { name: "Бренд", value: "Apple" },
+    { name: "Памʼять", value: "256 GB" },
+    { name: "Колір", value: "Titanium Black" },
+    { name: "Екран", value: "6.7 OLED" },
+  ],
+  reviews: [
+    {
+      name: "Іван",
+      surname: "Петренко",
+      rating: 5,
+      text: "Дуже крутий товар 🔥",
+      avatar: "https://i.pravatar.cc/100?img=12"
+    },
+    {
+      name: "Олена",
+      surname: "Коваль",
+      rating: 4,
+      text: "Камера просто топ! Я був приємно здивований якістю фото навіть у складних умовах освітлення. Знімки виходять дуже чіткі, з правильними кольорами та чудовою деталізацією. Особливо сподобалось, як працює нічний режим — фотографії виглядають так, ніби зроблені професійною камерою. Відео також на високому рівні: стабілізація працює ідеально, немає тряски навіть під час руху. В цілому, це один із найкращих смартфонів, які я використовував, і камера тут реально одна з головних причин для покупки.",
+      avatar: "https://i.pravatar.cc/100?img=32"
+    },
+  ],
+});
+
+const activeImage = ref(product.value.images[0]);
+
+const setImage = (img: string) => {
+  activeImage.value = img;
+};
+
+const getStars = (rating: number) => {
+  return Array.from({ length: 5 }, (_, i) => i < rating);
+};
+
+onMounted(() => {
+  setInterval(() => {
+    const currentIndex = product.value.images.indexOf(activeImage.value);
+    const nextIndex =
+        (currentIndex + 1) % product.value.images.length;
+    activeImage.value = product.value.images[nextIndex];
+  }, 3000);
+});
+
+const activeTab = ref<"chars" | "reviews">("chars");
+
+const discountPercent = (price: number, oldPrice: number) => {
+  return Math.round(((oldPrice - price) / oldPrice) * 100);
+};
+</script>
+
+<style scoped>
+.product-page {
+  padding: 20px 0;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+@media (min-width: 1800px) {
+  .container {
+    max-width: 1600px;
+  }
+}
+
+@media (min-width: 2200px) {
+  .container {
+    max-width: 1800px;
+  }
+}
+
+.product {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 50px;
+  align-items: start;
+}
+
+.gallery {
+  width: 100%;
+  transform: translateX(-45px);
+}
+
+.main-image {
+  width: 76%;
+  height: 650px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.main-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnails {
+  display: flex;
+  gap: 14px;
+  margin-top: 18px;
+  overflow-x: auto;
+  max-width: calc(6 * 130px + 4 * 14px);
+  scrollbar-width: thin;
+}
+
+.thumbnails::-webkit-scrollbar {
+  height: 6px;
+}
+
+.thumbnails::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.thumb {
+  width: 130px;
+  height: 95px;
+  cursor: pointer;
+  opacity: 0.6;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: 0.2s;
+  flex: 0 0 auto;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb:hover {
+  opacity: 1;
+}
+
+.thumb.active {
+  opacity: 1;
+  border: 2px solid #000;
+}
+
+.info {
+  width: 100%;
+}
+
+.title {
+  font-size: 34px;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.price-block {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.prices {
+  display: flex;
+  flex-direction: column;
+}
+
+.current {
+  font-size: 26px;
+  font-weight: bold;
+  color: #e60023;
+}
+
+.old {
+  font-size: 16px;
+  text-decoration: line-through;
+  color: #888;
+}
+
+.discount {
+  background: #e60023;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.description {
+  margin-bottom: 20px;
+  color: #555;
+}
+
+.buy-btn {
+  padding: 12px 20px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.tabs {
+  margin-top: 40px;
+  margin-left: -40px;
+}
+
+.tab-headers {
+  display: inline-flex;
+  padding: 10px;
+  border-radius: 16px;
+  background: #f1f3f5;
+  gap: 12px;
+  box-shadow: inset 0 0 0 1px #e5e7eb;
+}
+
+.tab-headers button {
+  position: relative;
+  padding: 14px 28px;
+  min-width: 180px;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #6b7280;
+  transition: all 0.25s ease;
+  text-align: center;
+}
+
+.tab-headers button:hover {
+  color: #111;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.tab-headers button.active {
+  background: #ffffff;
+  color: #111;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.10);
+}
+
+.tab-headers button.active::after {
+  content: "";
+  position: absolute;
+  left: 25%;
+  right: 25%;
+  bottom: 8px;
+  height: 3px;
+  background: #000;
+  border-radius: 2px;
+}
+
+.tab-content {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+}
+
+.tab-content--plain {
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+.chars {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+}
+
+.chars tr {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+}
+
+.chars td {
+  padding: 24px 30px;
+  font-size: 20px;
+  border: none;
+}
+
+.chars td:first-child {
+  font-weight: 600;
+  color: #555;
+  width: 40%;
+}
+
+.chars td:last-child {
+  font-weight: 700;
+  color: #111;
+}
+
+.review {
+  display: flex;
+  gap: 30px;
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 50px;
+  margin-bottom: 30px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+  transition: 0.25s ease;
+}
+
+.review:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
+}
+
+.review-avatar img {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.review-body {
+  flex: 1;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.review-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111;
+}
+
+.review-rating {
+  display: flex;
+  gap: 6px;
+}
+
+.star {
+  color: #f5b301;
+  font-size: 26px;
+}
+
+.review-text {
+  margin: 0;
+  color: #444;
+  font-size: 20px;
+  line-height: 1.8;
+}
+@media (min-width: 2560px) {
+  .gallery {
+    transform: translateX(-110px);
+  }
+
+  .thumbnails {
+    display: flex;
+    gap: 14px;
+    margin-top: 18px;
+    overflow-x: auto;
+  }
+
+  .thumb {
+    width: 150px;
+    height: 95px;
+    cursor: pointer;
+    opacity: 0.6;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: 0.2s;
+    flex: 0 0 auto;
+  }
+
+  .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .tabs {
+    margin-top: 40px;
+    margin-left: -120px;
+  }
+}
+</style>
