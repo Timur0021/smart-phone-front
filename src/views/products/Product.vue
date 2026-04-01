@@ -604,7 +604,7 @@ const discountPercent = (price: number, oldPrice: number) => {
 }
 @media (min-width: 2560px) {
   .gallery {
-    margin-left: 5rem
+    margin-left: 2rem
   }
 
   .thumbnails {
