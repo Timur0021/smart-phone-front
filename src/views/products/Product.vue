@@ -370,8 +370,8 @@ const discountPercent = (price: number, oldPrice: number) => {
 }
 
 .title {
-  font-size: 34px;
-  margin-bottom: 20px;
+  font-size: 50px;
+  margin-bottom: 40px;
   font-weight: 700;
 }
 
@@ -384,17 +384,18 @@ const discountPercent = (price: number, oldPrice: number) => {
 
 .prices {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
 .current {
-  font-size: 26px;
+  font-size: 36px;
   font-weight: bold;
   color: #e60023;
 }
 
 .old {
-  font-size: 16px;
+  font-size: 26px;
   text-decoration: line-through;
   color: #888;
 }
@@ -404,7 +405,7 @@ const discountPercent = (price: number, oldPrice: number) => {
   color: #fff;
   padding: 5px 10px;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 24px;
   font-weight: bold;
 }
 
