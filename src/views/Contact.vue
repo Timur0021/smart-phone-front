@@ -1,6 +1,10 @@
 <template>
   <div class="page">
-    <Breadcrumbs title="Контакти" />
+    <Breadcrumbs
+        :items="[
+          { name: 'Контакти', link: '/contacts' }
+        ]"
+    />
 
     <h1 class="title" v-if="blocks.length">
       {{ getTitle(blocks[0] ?? { id: '', name: '', type: '', block: [] }) }}

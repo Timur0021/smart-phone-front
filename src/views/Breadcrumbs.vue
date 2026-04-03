@@ -1,14 +1,33 @@
 <template>
   <nav class="breadcrumbs">
-    <a href="/" class="crumb">Головна</a>
+    <router-link to="/" class="crumb">Головна</router-link>
+
     <span class="separator">/</span>
-    <span class="current">{{ title }}</span>
+
+    <template v-for="(item, index) in items" :key="index">
+      <router-link
+          v-if="index !== items.length - 1"
+          :to="item.link"
+          class="crumb"
+      >
+        {{ item.name }}
+      </router-link>
+
+      <span v-else class="current">
+        {{ item.name }}
+      </span>
+
+      <span v-if="index !== items.length - 1" class="separator">/</span>
+    </template>
   </nav>
 </template>
 
 <script setup lang="ts">
 defineProps<{
-  title: string
+  items: {
+    name: string
+    link: string
+  }[]
 }>()
 </script>
 

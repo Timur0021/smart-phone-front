@@ -1,14 +1,15 @@
 <template>
   <div class="product-page">
-    <Breadcrumbs title="Товар" />
+    <Breadcrumbs
+        :items="[
+          { name: 'Товари', link: '/products' },
+          { name: product.title, link: `/products/${product.slug}` }
+        ]"
+    />
 
     <div class="container">
       <div class="product">
         <div class="gallery">
-          <div class="main-image">
-            <img :src="activeImage" alt="product" />
-          </div>
-
           <div class="thumbnails">
             <div
                 v-for="(img, index) in product.images"
@@ -19,6 +20,10 @@
             >
               <img :src="img" />
             </div>
+          </div>
+
+          <div class="main-image">
+            <img :src="activeImage" alt="product" />
           </div>
         </div>
 
@@ -135,16 +140,19 @@ import Breadcrumbs from "@/views/Breadcrumbs.vue";
 
 const product = ref({
   title: "iPhone 15 Pro Max 256GB",
+  slug: "iphone-15-pro-max-256gb",
   price: 58999,
   oldPrice: 69999,
   description:
       "Новий iPhone з титановим корпусом, потужним процесором та топовою камерою.",
   images: [
-    "https://images.unsplash.com/photo-1518773553398-650c184e0bb3",
-    "https://images.unsplash.com/photo-1518773553398-650c184e0bb3",
-    "https://images.unsplash.com/photo-1509395176047-4a66953fd231",
-    "https://images.unsplash.com/photo-1517433456452-f9633a875f6f",
-    "https://images.unsplash.com/photo-1509395176047-4a66953fd231",
+    "https://picsum.photos/id/1015/1200/800",
+    "https://picsum.photos/id/1016/1200/800",
+    "https://picsum.photos/id/1018/1200/800",
+    "https://picsum.photos/id/1020/1200/800",
+    "https://picsum.photos/id/1024/1200/800",
+    "https://picsum.photos/id/1027/1200/800",
+    "https://picsum.photos/id/1035/1200/800"
   ],
   characteristics: [
     { name: "Бренд", value: "Apple" },
@@ -303,12 +311,33 @@ const discountPercent = (price: number, oldPrice: number) => {
 }
 
 .gallery {
-  width: 100%;
-  margin-left: 4rem
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-left: 4rem;
+}
+
+.thumbnails {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 650px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  height: calc(6 * 100px + 3 * 14px);
+}
+
+.thumbnails::-webkit-scrollbar {
+  width: 6px;
+}
+
+.thumbnails::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
 }
 
 .main-image {
-  width: 76%;
+  width: 80%;
   height: 650px;
   border-radius: 16px;
   overflow: hidden;
@@ -321,27 +350,9 @@ const discountPercent = (price: number, oldPrice: number) => {
   object-fit: cover;
 }
 
-.thumbnails {
-  display: flex;
-  gap: 14px;
-  margin-top: 18px;
-  overflow-x: auto;
-  max-width: calc(6 * 130px + 4 * 14px);
-  scrollbar-width: thin;
-}
-
-.thumbnails::-webkit-scrollbar {
-  height: 6px;
-}
-
-.thumbnails::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 3px;
-}
-
 .thumb {
-  width: 130px;
-  height: 95px;
+  width: 150px;
+  height: 150px;
   cursor: pointer;
   opacity: 0.6;
   border-radius: 10px;
@@ -367,6 +378,10 @@ const discountPercent = (price: number, oldPrice: number) => {
 
 .info {
   width: 100%;
+  background: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 .title {

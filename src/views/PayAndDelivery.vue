@@ -1,6 +1,10 @@
 <template>
   <div class="page" v-if="page">
-    <Breadcrumbs :title="page.title" />
+    <Breadcrumbs
+        :items="[
+          { name: 'Оплата та доставка', link: '/oplata-ta-dostavka' }
+        ]"
+    />
 
     <h1 class="title">{{ page.title }}</h1>
 
