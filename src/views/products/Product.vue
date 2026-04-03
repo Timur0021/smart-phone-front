@@ -28,6 +28,16 @@
         </div>
 
         <div class="info">
+          <div class="product-meta">
+            <div class="product-code">
+              Код: {{ product.code }}
+            </div>
+
+            <div class="availability" v-if="product.inStock">
+              <span class="dot"></span>
+              <span>В наявності</span>
+            </div>
+          </div>
           <h1 class="title">{{ product.title }}</h1>
 
           <div class="price-block">
@@ -44,12 +54,16 @@
             </div>
           </div>
 
-          <p class="description">
-            {{ product.description }}
-          </p>
-
           <button class="buy-btn">Купити</button>
         </div>
+      </div>
+
+      <div class="description-box">
+        <h2 class="description-title">Опис</h2>
+
+        <p class="description">
+          {{ product.description }}
+        </p>
       </div>
 
       <div class="tabs">
@@ -141,10 +155,17 @@ import Breadcrumbs from "@/views/Breadcrumbs.vue";
 const product = ref({
   title: "iPhone 15 Pro Max 256GB",
   slug: "iphone-15-pro-max-256gb",
+  code: "IP15PM-256",
+  inStock: true,
   price: 58999,
   oldPrice: 69999,
+  quantity: 50,
   description:
-      "Новий iPhone з титановим корпусом, потужним процесором та топовою камерою.",
+      "iPhone 15 Pro Max 256GB — це флагманський смартфон від Apple, який поєднує в собі преміальний дизайн, високу продуктивність, передові камери та великий, якісний дисплей. Він створений для користувачів, які очікують максимум можливостей від мобільного пристрою — як у повсякденному використанні, так і в професійних задачах." +
+      "\n" +
+      "Корпус пристрою виготовлений з титану, що робить його значно міцнішим і водночас легшим у порівнянні з попередніми моделями. Завдяки цьому смартфон зручно лежить у руці та має більш витончений і сучасний вигляд. Закруглені краї та мінімалістичний дизайн підкреслюють преміальний характер пристрою." +
+      "\n" +
+      "Дисплей Super Retina XDR з діагоналлю 6.7 дюйма забезпечує надзвичайно чітке та яскраве зображення. Підтримка ProMotion з частотою оновлення до 120 Гц гарантує плавну анімацію, швидку реакцію інтерфейсу та комфорт під час перегляду контенту, ігор або роботи з додатками. Екран відзначається високою яскравістю, точною передачею кольорів і глибоким чорним кольором.",
   images: [
     "https://picsum.photos/id/1015/1200/800",
     "https://picsum.photos/id/1016/1200/800",
@@ -384,6 +405,50 @@ const discountPercent = (price: number, oldPrice: number) => {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
+.product-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  font-size: 18px;
+  color: #555;
+}
+
+.product-code {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.availability {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 18px;
+  color: #16a34a;
+}
+
+.dot {
+  width: 20px;
+  height: 20px;
+  background: #16a34a;
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 0 0 2px #16a34a;
+}
+
+.dot::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -58%);
+  font-size: 14px;
+  color: white;
+  font-weight: 900;
+  line-height: 1;
+}
+
 .title {
   font-size: 50px;
   margin-bottom: 40px;
@@ -436,6 +501,29 @@ const discountPercent = (price: number, oldPrice: number) => {
   border: none;
   cursor: pointer;
   border-radius: 6px;
+}
+
+.description-box {
+  max-width: 1400px;
+  margin: 80px auto 0 auto;
+  padding: 25px 30px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.description-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #111;
+}
+
+.description-box .description {
+  margin: 0;
+  color: #555;
+  font-size: 20px;
+  line-height: 1.8;
 }
 
 .tabs {
@@ -645,6 +733,15 @@ const discountPercent = (price: number, oldPrice: number) => {
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  .description-box {
+    max-width: 1700px;
+    margin: 80px auto 0 auto;
+    padding: 25px 30px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   }
 
   .tabs {
