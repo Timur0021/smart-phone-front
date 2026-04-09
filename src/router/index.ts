@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 
 const routes = [
@@ -57,8 +57,13 @@ const routes = [
         component: () => import('../views/dashboard/Dashboard.vue'),
     },
     {
-        path: '/:lang(en)?/product',
-        name: 'dashboard',
+        path: '/:lang(en)?/products',
+        name: 'products',
+        component: () => import('../views/products/Products.vue'),
+    },
+    {
+        path: '/:lang(en)?/product/:slug',
+        name: 'product',
         component: () => import('../views/products/Product.vue'),
     },
 ]
