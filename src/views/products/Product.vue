@@ -38,23 +38,48 @@
               <span>В наявності</span>
             </div>
           </div>
+
           <h1 class="title">{{ product.title }}</h1>
 
-          <div class="price-block">
-            <div class="prices">
-              <span class="current">₴ {{ product.price }}</span>
+          <div class="divider"></div>
 
-              <span class="old" v-if="product.oldPrice">
-                ₴ {{ product.oldPrice }}
-              </span>
+          <div class="price-block">
+            <div class="quantity">
+              <button class="qty-btn" @click="decrease">−</button>
+
+              <input
+                  class="qty-value"
+                  type="number"
+                  v-model.number="quantity"
+                  min="1"
+              />
+
+              <button class="qty-btn" @click="increase">+</button>
             </div>
 
-            <div class="discount" v-if="product.oldPrice">
-              -{{ discountPercent(product.price, product.oldPrice) }}%
+            <div class="prices">
+              <span class="old" v-if="product.oldPrice">
+                {{ product.oldPrice }} ₴
+              </span>
+
+              <span class="current">{{ product.price }} ₴</span>
             </div>
           </div>
 
-          <button class="buy-btn">Купити</button>
+          <div class="divider"></div>
+
+          <div class="actions">
+            <div class="left-actions">
+              <button class="buy-btn primary">В кошик</button>
+              <button class="buy-btn secondary">Усі товари бренду</button>
+            </div>
+
+            <button class="favorite-btn" @click="toggleFavorite">
+                <span>
+                  {{ isFavorite ? '❤️' : '♡' }}
+                </span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -149,7 +174,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import Breadcrumbs from "@/views/Breadcrumbs.vue";
 
 const product = ref({
@@ -294,10 +319,28 @@ onMounted(() => {
   }, 3000);
 });
 
+const quantity = ref(1);
+
+const increase = () => {
+  quantity.value++;
+};
+
+const decrease = () => {
+  if (quantity.value > 1) quantity.value--;
+};
+
+watch(quantity, (val) => {
+  if (!val || val < 1) {
+    quantity.value = 1;
+  }
+});
+
 const activeTab = ref<"chars" | "reviews">("chars");
 
-const discountPercent = (price: number, oldPrice: number) => {
-  return Math.round(((oldPrice - price) / oldPrice) * 100);
+const isFavorite = ref(false);
+
+const toggleFavorite = () => {
+  isFavorite.value = !isFavorite.value;
 };
 </script>
 
@@ -455,38 +498,78 @@ const discountPercent = (price: number, oldPrice: number) => {
   font-weight: 700;
 }
 
+.divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 20px 0;
+}
+
 .price-block {
   display: flex;
   align-items: center;
-  gap: 15px;
+  justify-content: flex-start;
+  gap: 40px;
   margin-bottom: 15px;
 }
 
-.prices {
+.quantity {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
+.qty-btn {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-size: 26px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+
+.qty-value {
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  outline: none;
+  appearance: textfield;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  font-size: 24px;
+  font-weight: 700;
+  background: #fff;
+}
+
+.qty-value::-webkit-outer-spin-button,
+.qty-value::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.prices {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
 .current {
   font-size: 36px;
   font-weight: bold;
-  color: #e60023;
+  color: #000000;
 }
 
 .old {
-  font-size: 26px;
+  font-size: 24px;
   text-decoration: line-through;
   color: #888;
-}
-
-.discount {
-  background: #e60023;
-  color: #fff;
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-size: 24px;
-  font-weight: bold;
+  position: relative;
+  top: -2px;
 }
 
 .description {
@@ -494,13 +577,81 @@ const discountPercent = (price: number, oldPrice: number) => {
   color: #555;
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.left-actions {
+  display: flex;
+  align-items: center;
+}
+
 .buy-btn {
-  padding: 12px 20px;
-  background: black;
-  color: white;
+  padding: 16px 26px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
-  border-radius: 6px;
+  transition: 0.2s;
+  margin-right: 15px
+}
+
+.buy-btn:last-child {
+  margin-right: 0;
+}
+
+.buy-btn.primary {
+  background: #2563eb;
+  color: #fff;
+}
+
+.buy-btn.primary:hover {
+  background: #1e40af;
+}
+
+.buy-btn.secondary {
+  background: #f97316;
+  color: #fff;
+}
+
+.buy-btn.secondary:hover {
+  background: #ea580c;
+}
+
+.favorite-btn {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+
+.favorite-btn:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  transform: scale(1.05);
+}
+
+.favorite-btn span {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.favorite-btn span.active {
+  color: #ef4444;
+}
+
+.favorite-btn:hover {
+  transform: scale(1.1);
 }
 
 .description-box {
