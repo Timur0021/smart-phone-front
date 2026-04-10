@@ -455,5 +455,50 @@ const paginatedProducts = computed(() => {
     margin: 0 auto;
     padding: 32px 32px;
   }
+
+  .sort-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    width: 480px;
+    height: 60px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 22px;
+
+    padding: 0 60px 0 22px;
+
+    font-size: 26px;
+    font-weight: 600;
+
+    color: #111;
+    background-color: #fff;
+
+    cursor: pointer;
+
+    transition: all 0.25s ease;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 20 20'%3E%3Cpath fill='%23555' d='M5.5 7.5l4.5 5 4.5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    background-size: 26px;
+  }
+
+  .sort-select:hover {
+    border-color: #007bff;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.12);
+  }
+
+  .sort-select option {
+    font-size: 26px;
+    padding: 10px;
+  }
+
+  .count {
+    font-size: 40px;
+    font-weight: 700;
+    color: #555;
+  }
 }
 </style>
