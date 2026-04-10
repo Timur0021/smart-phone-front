@@ -1,7 +1,10 @@
 <template>
   <div class="page">
-    <Breadcrumbs title="Бренди" />
-
+    <Breadcrumbs
+        :items="[
+          { name: 'Бренди', link: '/brands' }
+        ]"
+    />
     <h1 class="title">Бренди</h1>
 
     <div class="alphabet-box">

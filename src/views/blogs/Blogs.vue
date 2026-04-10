@@ -326,10 +326,6 @@ const paginatedBlogs = computed(() => blogs.value)
   color: #fff;
 }
 
-.cat-news { background: #2563eb; }
-.cat-analytics { background: #7c3aed; }
-.cat-guides { background: #059669; }
-
 .blog-date {
   font-size: 16px;
   color: #666;
