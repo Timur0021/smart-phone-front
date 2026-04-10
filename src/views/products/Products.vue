@@ -448,7 +448,6 @@ const paginatedProducts = computed(() => {
   color: white;
 }
 
-/* 🔥 НЕ ТРОГАЮ - як ти просив */
 @media (min-width: 2560px) {
   .products-page {
     max-width: 130rem;
