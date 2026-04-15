@@ -94,13 +94,26 @@
         </div>
         <div class="grid">
           <div v-for="product in paginatedProducts" :key="product.id" class="card">
-            <div class="favorite">❤</div>
+            <div
+                class="favorite"
+                @click="toggleFavorite(product)"
+            >
+              <span v-if="product.isFavorite">❤️</span>
+              <span v-else>🤍</span>
+            </div>
 
             <img :src="product.image" class="image" />
 
-            <div class="reviews">{{ product.reviews_count }} відгуків</div>
+            <div class="reviews">
+              ⭐ {{ product.reviews_count }} відгуків
+            </div>
 
-            <h3 class="title">{{ product.title }}</h3>
+            <router-link
+                :to="`/product/${product.slug}`"
+                class="title"
+            >
+              {{ product.title }}
+            </router-link>
 
             <div class="prices">
               <div>
@@ -168,6 +181,10 @@ const openBlocks = ref({
   values: true
 })
 
+const toggleFavorite = (product: any) => {
+  product.isFavorite = !product.isFavorite
+}
+
 const toggleBlock = (key: 'categories' | 'brands' | 'values') => {
   openBlocks.value[key] = !openBlocks.value[key]
 }
@@ -193,15 +210,22 @@ const visibleBrands = computed(() =>
 const visibleValues = computed(() =>
     showAll.value.values ? values.value : values.value.slice(0, 3)
 )
-
+const phoneImages = [
+  'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400',
+  'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400',
+  'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=400',
+  'https://images.unsplash.com/photo-1603898037225-1c9c9d6f5c3d?w=400'
+]
 const products = ref(
     Array.from({ length: 35 }, (_, i) => ({
       id: i + 1,
       title: `Товар ${i + 1}`,
+      slug: `product-${i + 1}`,
       price: 1000 + i * 10,
       old_price: i % 2 ? 1200 + i * 10 : null,
       reviews_count: i,
-      image: 'https://via.placeholder.com/300'
+      image: phoneImages[i % phoneImages.length],
+      isFavorite: false
     }))
 )
 
@@ -266,6 +290,7 @@ const paginatedProducts = computed(() => {
   max-width: 90rem;
   margin: 0 auto;
   padding: 32px;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
 }
 
 .breadcrumbs {
@@ -422,12 +447,133 @@ const paginatedProducts = computed(() => {
   border-radius: 16px;
   padding: 15px;
   box-shadow: 0 6px 25px rgba(0,0,0,0.06);
+  height: 520px;
+  position: relative;
 }
 
 .image {
   width: 100%;
-  height: 180px;
+  height: 330px;
   object-fit: cover;
+  border-radius: 12px;
+}
+
+.reviews {
+  margin-top: 14px;
+  font-size: 22px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.favorite {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #fff;
+  border-radius: 50%;
+  border: 1.5px solid #e5e7eb;
+
+  font-size: 22px;
+  cursor: pointer;
+
+  transition: all 0.25s ease;
+}
+
+.favorite:hover {
+  transform: scale(1.1);
+  border-color: #ff4d4f;
+}
+
+.favorite span {
+  transition: transform 0.2s ease;
+}
+
+.favorite:active span {
+  transform: scale(1.2);
+}
+
+.title {
+  display: block;
+
+  margin-top: 18px;
+
+  font-size: 30px;
+  font-weight: 800;
+
+  line-height: 1.2;
+
+  color: #111;
+  text-decoration: none;
+
+  transition: color 0.2s ease;
+}
+
+.title:hover {
+  color: #007bff;
+}
+
+.prices {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  margin-top: 18px;
+}
+
+.prices > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.new-price {
+  font-size: 30px;
+  font-weight: 800;
+  color: #111;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.old-price {
+  font-size: 20px;
+  font-weight: 500;
+  color: #9ca3af;
+
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  text-decoration-color: #9ca3af;
+
+  transform: none;
+}
+
+.buy-btn {
+  padding: 14px 22px;
+  font-size: 24px;
+  font-weight: 700;
+
+  color: #fff;              /* білий текст */
+  background: #4f46e5;      /* фіолетовий (можеш змінити) */
+
+  border: none;
+  border-radius: 14px;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  white-space: nowrap;
+}
+
+.buy-btn:hover {
+  background: #3730a3;
+  transform: translateY(-1px);
 }
 
 .pagination {
