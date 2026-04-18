@@ -130,12 +130,30 @@
 
         <div class="pagination">
           <button
-              v-for="page in totalPages"
-              :key="page"
-              @click="currentPage = page"
-              :class="['page-btn', { active: page === currentPage }]"
+              class="page-btn"
+              :disabled="currentPage === 1"
+              @click="currentPage--"
           >
-            {{ page }}
+            ‹
+          </button>
+          <button
+              v-for="pageNumber in pageNumbers"
+              :key="pageNumber + ''"
+              @click="typeof pageNumber === 'number' && (currentPage = pageNumber)"
+              :disabled="pageNumber === '...'"
+              :class="[
+                'page-btn',
+                { active: pageNumber === currentPage, disabled: pageNumber === '...' }
+              ]"
+          >
+            {{ pageNumber }}
+          </button>
+          <button
+              class="page-btn"
+              :disabled="currentPage === totalPages"
+              @click="currentPage++"
+          >
+            ›
           </button>
         </div>
       </div>
@@ -217,7 +235,7 @@ const phoneImages = [
   'https://images.unsplash.com/photo-1603898037225-1c9c9d6f5c3d?w=400'
 ]
 const products = ref(
-    Array.from({ length: 35 }, (_, i) => ({
+    Array.from({ length: 55 }, (_, i) => ({
       id: i + 1,
       title: `Товар ${i + 1}`,
       slug: `product-${i + 1}`,
@@ -231,6 +249,38 @@ const products = ref(
 
 const currentPage = ref(1)
 const perPage = 9
+
+const pageNumbers = computed(() => {
+  const total = totalPages.value
+  const current = currentPage.value
+
+  if (total <= 5) {
+    return Array.from({ length: total }, (_, i) => i + 1)
+  }
+
+  const pages: (number | string)[] = []
+
+  pages.push(1)
+
+  if (current > 3) {
+    pages.push('...')
+  }
+
+  const start = Math.max(2, current - 1)
+  const end = Math.min(total - 1, current + 1)
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i)
+  }
+
+  if (current < total - 2) {
+    pages.push('...')
+  }
+
+  pages.push(total)
+
+  return pages
+})
 
 const filteredProducts = computed(() => {
   let list = [...products.value]
@@ -559,8 +609,8 @@ const paginatedProducts = computed(() => {
   font-size: 24px;
   font-weight: 700;
 
-  color: #fff;              /* білий текст */
-  background: #4f46e5;      /* фіолетовий (можеш змінити) */
+  color: #fff;
+  background: #007bff;
 
   border: none;
   border-radius: 14px;
@@ -572,7 +622,7 @@ const paginatedProducts = computed(() => {
 }
 
 .buy-btn:hover {
-  background: #3730a3;
+  background: #0257b0;
   transform: translateY(-1px);
 }
 
@@ -583,17 +633,38 @@ const paginatedProducts = computed(() => {
 }
 
 .page-btn {
-  padding: 6px 12px;
-  border-radius: 8px;
+  min-width: 56px;
+  height: 56px;
+
+  padding: 0 16px;
+
+  border-radius: 12px;
   background: #eee;
   border: none;
+
+  font-size: 20px;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
 }
 
 .page-btn.active {
-  background: #4f46e5;
+  background: #007bff;
   color: white;
 }
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
 
+.page-btn.disabled {
+  background: transparent;
+  cursor: default;
+}
 @media (min-width: 2560px) {
   .products-page {
     max-width: 130rem;
