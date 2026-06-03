@@ -72,6 +72,7 @@
             <div class="left-actions">
               <button class="buy-btn primary">В кошик</button>
               <button class="buy-btn secondary">Усі товари бренду</button>
+              <button class="buy-btn info" @click="openReviewModal">Залишити відгук</button>
             </div>
 
             <button class="favorite-btn" @click="toggleFavorite">
@@ -171,10 +172,49 @@
       </div>
     </div>
   </div>
+  <div v-if="showReviewModal" class="modal-overlay" @click.self="closeReviewModal">
+    <div class="modal">
+      <button class="modal-close" @click="closeReviewModal">✕</button>
+
+      <h2>Залишити відгук</h2>
+
+      <div class="form-group">
+        <input v-model="reviewForm.fullName" placeholder="Ім'я та прізвище" />
+      </div>
+
+      <div class="form-group">
+        <StarRatings
+            v-model="reviewForm.rating"
+            :numberOfStars="5"
+            :starSize="50"
+            :step="0.5"
+            starColor="#f5a623"
+            inactiveColor="#ccc"
+        />
+      </div>
+
+      <div class="form-group">
+        <textarea
+            v-model="reviewForm.text"
+            placeholder="Коментар..."
+            rows="5"
+        ></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button @click="closeReviewModal">Скасувати</button>
+        <button class="submit" @click="submitReview">
+          Відправити
+        </button>
+      </div>
+
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from "vue";
+import StarRatings from "vue3-star-ratings";
 import Breadcrumbs from "@/views/Breadcrumbs.vue";
 
 const product = ref({
@@ -279,6 +319,33 @@ const product = ref({
     }
   ],
 });
+
+const showReviewModal = ref(false);
+const reviewForm = ref({
+  fullName: "",
+  rating: 0,
+  text: ""
+});
+
+const openReviewModal = () => {
+  showReviewModal.value = true;
+};
+
+const closeReviewModal = () => {
+  showReviewModal.value = false;
+};
+
+const submitReview = () => {
+  console.log("Review:", reviewForm.value);
+
+  closeReviewModal();
+
+  reviewForm.value = {
+    fullName: "",
+    rating: 0,
+    text: ""
+  };
+};
 
 const activeImage = ref(product.value.images[0]);
 
@@ -586,10 +653,13 @@ const toggleFavorite = () => {
 
 .left-actions {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .buy-btn {
+  flex: 1;
+  flex-shrink: 0;
   padding: 16px 26px;
   font-size: 18px;
   font-weight: 600;
@@ -597,12 +667,8 @@ const toggleFavorite = () => {
   border: none;
   cursor: pointer;
   transition: 0.2s;
-  margin-right: 15px
 }
 
-.buy-btn:last-child {
-  margin-right: 0;
-}
 
 .buy-btn.primary {
   background: #2563eb;
@@ -620,6 +686,14 @@ const toggleFavorite = () => {
 
 .buy-btn.secondary:hover {
   background: #ea580c;
+}
+
+.buy-btn.info {
+  background: #14b8a6;
+  color: #fff;
+}
+.buy-btn.info:hover {
+  background: #0f766e;
 }
 
 .favorite-btn {
@@ -898,6 +972,111 @@ const toggleFavorite = () => {
   .tabs {
     margin-top: 40px;
     margin-left: 40px;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+
+  .modal {
+    width: 600px;
+    transform: translateX(40px);
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    position: relative;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    font-size: 20px;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-close:hover {
+    background: #f3f4f6;
+  }
+
+  .modal h2 {
+    font-size: 40px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    margin-bottom: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .modal-actions button {
+    padding: 14px 22px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    min-width: 140px;
+    transition: 0.2s;
+  }
+
+  .modal-actions button:first-child {
+    background: #e5e7eb;
+    color: #111;
+  }
+
+  .modal-actions button:first-child:hover {
+    background: #d1d5db;
+  }
+
+  .submit {
+    background: #2563eb;
+    color: white;
+  }
+
+  .submit:hover {
+    background: #1d4ed8;
   }
 }
 </style>
