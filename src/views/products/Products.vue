@@ -146,7 +146,7 @@
                 :to="`/product/${product.slug}`"
                 class="title"
             >
-              {{ product.title }}
+              {{ product.name }}
             </router-link>
 
             <div class="prices">
