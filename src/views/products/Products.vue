@@ -139,7 +139,7 @@
             <img :src="product.image" class="image"  alt="image"/>
 
             <div class="reviews">
-              ⭐ {{ product.reviews_count }} відгуків
+              ⭐ {{ product.views_count ?? 0 }} відгуків
             </div>
 
             <router-link
