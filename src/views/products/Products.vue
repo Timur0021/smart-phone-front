@@ -17,10 +17,44 @@
           </div>
 
           <div v-show="openBlocks.categories">
-            <label v-for="cat in visibleCategories" :key="cat.id" class="checkbox">
-              <input type="checkbox" v-model="selected.categories" :value="cat.id" />
-              <span>{{ cat.name }}</span>
-            </label>
+            <div v-for="cat in visibleCategories" :key="cat.id">
+              <div class="category-parent">
+                <label class="checkbox">
+                  <input
+                      type="checkbox"
+                      v-model="selected.categories"
+                      :value="cat.id"
+                      @click.stop
+                  />
+                  <span>{{ cat.name }}</span>
+                </label>
+
+                <span
+                    v-if="cat.children?.length"
+                    class="category-arrow"
+                    :class="{ open: openedCategories[cat.id] }"
+                    @click.stop="toggleCategory(cat.id)"
+                ></span>
+              </div>
+
+              <div
+                  v-if="cat.children?.length"
+                  v-show="openedCategories[cat.id]"
+              >
+                <label
+                    v-for="child in cat.children"
+                    :key="child.id"
+                    class="checkbox category-child"
+                >
+                  <input
+                      type="checkbox"
+                      v-model="selected.categories"
+                      :value="child.id"
+                  />
+                  <span>{{ child.name }}</span>
+                </label>
+              </div>
+            </div>
 
             <div
                 v-if="categories.length > 3"
@@ -89,11 +123,11 @@
           </div>
 
           <div class="count">
-            {{ filteredProducts.length }} товарів
+            {{ pagination.total }} товарів
           </div>
         </div>
         <div class="grid">
-          <div v-for="product in paginatedProducts" :key="product.id" class="card">
+          <div v-for="product in products_data" :key="product.id" class="card">
             <div
                 class="favorite"
                 @click="toggleFavorite(product)"
@@ -102,7 +136,7 @@
               <span v-else>🤍</span>
             </div>
 
-            <img :src="product.image" class="image" />
+            <img :src="product.image" class="image"  alt="image"/>
 
             <div class="reviews">
               ⭐ {{ product.reviews_count }} відгуків
@@ -150,7 +184,7 @@
           </button>
           <button
               class="page-btn"
-              :disabled="currentPage === totalPages"
+              :disabled="currentPage === pagination.lastPage"
               @click="currentPage++"
           >
             ›
@@ -162,30 +196,53 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
+import { apolloClient } from "@/graphql/apolloClient.ts";
+import { GET_PRODUCTS} from "@/graphql/queries/products/products.ts";
 
 const sortBy = ref('popular')
+const openedCategories = ref<Record<number, boolean>>({})
 
-const categories = ref([
-  { id: 1, name: 'Телефони' },
-  { id: 2, name: 'Ноутбуки' },
-  { id: 3, name: 'Планшети' },
-  { id: 4, name: 'Аксесуари' }
-])
+const products_data = ref([])
+const categories = ref([])
+const brands = ref([])
+const values = ref([])
+const currentPage = ref(1)
+const pagination = ref({
+  currentPage: 1,
+  lastPage: 1,
+  total: 0,
+})
 
-const brands = ref([
-  { id: 1, name: 'Apple' },
-  { id: 2, name: 'Samsung' },
-  { id: 3, name: 'Xiaomi' },
-  { id: 4, name: 'Huawei' }
-])
+const loadProducts = async () => {
+  try {
+    const { data } = await apolloClient.query({
+      query: GET_PRODUCTS,
+      variables: {
+        page: currentPage.value,
+        limit: 9,
+        category_slug: null,
+      },
+      fetchPolicy: 'network-only',
+    })
 
-const values = ref([
-  { id: 1, name: '128GB' },
-  { id: 2, name: '256GB' },
-  { id: 3, name: '512GB' },
-  { id: 4, name: '1TB' }
-])
+    products_data.value = data?.products.data
+    pagination.value = data?.products.pagination
+
+    categories.value = data?.products.filters.categories
+    brands.value = data?.products.filters.brands
+    values.value = data?.products.filters.values
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+watch(currentPage, () => {
+  loadProducts()
+})
+onMounted(() => {
+  loadProducts()
+})
 
 const selected = ref({
   categories: [],
@@ -205,6 +262,10 @@ const toggleFavorite = (product: any) => {
 
 const toggleBlock = (key: 'categories' | 'brands' | 'values') => {
   openBlocks.value[key] = !openBlocks.value[key]
+}
+
+const toggleCategory = (id: number) => {
+  openedCategories.value[id] = !openedCategories.value[id]
 }
 
 const showAll = ref({
@@ -228,110 +289,47 @@ const visibleBrands = computed(() =>
 const visibleValues = computed(() =>
     showAll.value.values ? values.value : values.value.slice(0, 3)
 )
-const phoneImages = [
-  'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400',
-  'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400',
-  'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=400',
-  'https://images.unsplash.com/photo-1603898037225-1c9c9d6f5c3d?w=400'
-]
-const products = ref(
-    Array.from({ length: 55 }, (_, i) => ({
-      id: i + 1,
-      title: `Товар ${i + 1}`,
-      slug: `product-${i + 1}`,
-      price: 1000 + i * 10,
-      old_price: i % 2 ? 1200 + i * 10 : null,
-      reviews_count: i,
-      image: phoneImages[i % phoneImages.length],
-      isFavorite: false
-    }))
-)
 
-const currentPage = ref(1)
-const perPage = 9
-
+const totalPages = computed(() => pagination.value.lastPage)
 const pageNumbers = computed(() => {
-  const total = totalPages.value
+  const total = pagination.value.lastPage
   const current = currentPage.value
 
-  if (total <= 5) {
+  if (total <= 7) {
     return Array.from({ length: total }, (_, i) => i + 1)
   }
 
   const pages: (number | string)[] = []
 
-  pages.push(1)
-
-  if (current > 3) {
-    pages.push('...')
+  if (current <= 4) {
+    pages.push(1, 2, 3, 4, 5, '...', total)
+    return pages
   }
 
-  const start = Math.max(2, current - 1)
-  const end = Math.min(total - 1, current + 1)
-
-  for (let i = start; i <= end; i++) {
-    pages.push(i)
+  if (current >= total - 3) {
+    pages.push(
+        1,
+        '...',
+        total - 4,
+        total - 3,
+        total - 2,
+        total - 1,
+        total
+    )
+    return pages
   }
 
-  if (current < total - 2) {
-    pages.push('...')
-  }
-
-  pages.push(total)
+  pages.push(
+      1,
+      '...',
+      current - 1,
+      current,
+      current + 1,
+      '...',
+      total
+  )
 
   return pages
-})
-
-const filteredProducts = computed(() => {
-  let list = [...products.value]
-
-  if (selected.value.categories.length) {
-    list = list.filter(p =>
-        selected.value.categories.includes(p.id % 4 + 1)
-    )
-  }
-
-  if (selected.value.brands.length) {
-    list = list.filter(p =>
-        selected.value.brands.includes(p.id % 4 + 1)
-    )
-  }
-
-  if (selected.value.values.length) {
-    list = list.filter(p =>
-        selected.value.values.includes(p.id % 4 + 1)
-    )
-  }
-
-  switch (sortBy.value) {
-    case 'price_asc':
-      list.sort((a, b) => a.price - b.price)
-      break
-
-    case 'price_desc':
-      list.sort((a, b) => b.price - a.price)
-      break
-
-    case 'new':
-      list.sort((a, b) => b.id - a.id)
-      break
-
-    case 'popular':
-    default:
-      list.sort((a, b) => b.reviews_count - a.reviews_count)
-      break
-  }
-
-  return list
-})
-
-const totalPages = computed(() =>
-    Math.ceil(filteredProducts.value.length / perPage)
-)
-
-const paginatedProducts = computed(() => {
-  const start = (currentPage.value - 1) * perPage
-  return filteredProducts.value.slice(start, start + perPage)
 })
 </script>
 
@@ -665,6 +663,39 @@ const paginatedProducts = computed(() => {
   background: transparent;
   cursor: default;
 }
+.category-child {
+  padding-left: 35px;
+  position: relative;
+  font-size: 24px;
+}
+
+.category-parent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.category-arrow {
+  width: 10px;
+  height: 10px;
+  border-right: 3px solid #333;
+  border-bottom: 3px solid #333;
+  transform: rotate(45deg);
+  transition: .2s ease;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.category-arrow.open {
+  transform: rotate(-135deg);
+  border-color: #007bff;
+}
+
+.category-parent,
+.category-parent * {
+  user-select: none;
+}
 @media (min-width: 2560px) {
   .products-page {
     max-width: 130rem;
@@ -715,6 +746,39 @@ const paginatedProducts = computed(() => {
     font-size: 40px;
     font-weight: 700;
     color: #555;
+  }
+  .category-child {
+    padding-left: 35px;
+    position: relative;
+    font-size: 24px;
+  }
+
+  .category-parent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .category-arrow {
+    width: 10px;
+    height: 10px;
+    border-right: 3px solid #333;
+    border-bottom: 3px solid #333;
+    transform: rotate(45deg);
+    transition: .2s ease;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+
+  .category-arrow.open {
+    transform: rotate(-135deg);
+    border-color: #007bff;
+  }
+
+  .category-parent,
+  .category-parent * {
+    user-select: none;
   }
 }
 </style>
