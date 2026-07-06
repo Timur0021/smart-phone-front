@@ -776,6 +776,7 @@ const pageNumbers = computed(() => {
     border-color: #007bff;
   }
 
+  .arrow,
   .category-parent,
   .category-parent * {
     user-select: none;
