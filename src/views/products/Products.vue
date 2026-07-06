@@ -290,7 +290,6 @@ const visibleValues = computed(() =>
     showAll.value.values ? values.value : values.value.slice(0, 3)
 )
 
-const totalPages = computed(() => pagination.value.lastPage)
 const pageNumbers = computed(() => {
   const total = pagination.value.lastPage
   const current = currentPage.value
