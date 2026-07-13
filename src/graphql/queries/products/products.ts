@@ -6,6 +6,7 @@ export const GET_PRODUCTS = gql`
     $limit: Int!
     $category_slug: String
     $filters: [Filter]
+    $sort_by: SortByEnum
   ) {
     products(
       input: {
@@ -13,6 +14,7 @@ export const GET_PRODUCTS = gql`
         limit: $limit
         category_slug: $category_slug
         filters: $filters
+        sort_by: $sort_by
       }
     ) {
       data {
@@ -28,6 +30,7 @@ export const GET_PRODUCTS = gql`
         slug
         views_count
         image
+        is_favorite
       }
 
       filters {

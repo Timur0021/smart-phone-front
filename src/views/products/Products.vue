@@ -118,6 +118,12 @@
               />
 
               <span>{{ value.name }}</span>
+
+              <span
+                  v-if="characteristic.name.toLowerCase() === 'колір'"
+                  class="color-dot"
+                  :style="{ backgroundColor: getColor(value.name) }"
+              ></span>
             </label>
           </div>
         </div>
@@ -127,10 +133,10 @@
         <div class="products-header">
           <div class="sort">
             <select v-model="sortBy" class="sort-select">
-              <option value="popular">За популярністю</option>
-              <option value="price_asc">Ціна: зростання</option>
-              <option value="price_desc">Ціна: спадання</option>
-              <option value="new">Новинки</option>
+              <option value="POPULAR">За популярністю</option>
+              <option value="LOWER_PRICE">Ціна: зростання</option>
+              <option value="HIGH_PRICE">Ціна: спадання</option>
+              <option value="NEW">Новинки</option>
             </select>
           </div>
 
@@ -144,7 +150,7 @@
                 class="favorite"
                 @click="toggleFavorite(product)"
             >
-              <span v-if="product.isFavorite">❤️</span>
+              <span v-if="product.is_favorite">❤️</span>
               <span v-else>🤍</span>
             </div>
 
@@ -211,16 +217,33 @@
 import { onMounted, ref, computed, watch } from 'vue'
 import { apolloClient } from "@/graphql/apolloClient.ts";
 import { GET_PRODUCTS} from "@/graphql/queries/products/products.ts";
+import { GET_WISHLIST_STATUS } from "@/graphql/queries/products/wishlistProductIds.ts";
+import { ADD_WISHLIST } from "@/graphql/mutations/products/addWishlist.ts";
+import { DELETE_WISHLIST } from "@/graphql/mutations/products/deleteWishlist.ts";
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
 
-const sortBy = ref('popular')
+const getColor = (name: string) => {
+  const map: Record<string, string> = {
+    чорний: 'black',
+    білий: 'white',
+    червоний: 'red',
+    зелений: 'green',
+    синій: 'blue',
+    сірий: 'gray',
+    золотий: 'gold',
+  }
+
+  return map[name.toLowerCase()] || name.toLowerCase()
+}
+
+const sortBy = ref('POPULAR')
 const openedCategories = ref<Record<number, boolean>>({})
 const openedCharacteristics = ref<Record<number, boolean>>({})
 
-const products_data = ref([])
+const products_data = ref<any[]>([])
 const categories = ref([])
 const brands = ref([])
 const characteristics = ref([])
@@ -280,6 +303,37 @@ const filters = computed(() => {
   return result
 })
 
+const loadWishlistStatus = async () => {
+  const token = localStorage.getItem('token')
+
+  if (!token || !products_data.value.length) {
+    return
+  }
+
+  const ids = products_data.value.map(product => product.id)
+
+  const { data } = await apolloClient.query({
+    query: GET_WISHLIST_STATUS,
+    variables: {
+      ids
+    },
+    context: {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    },
+    fetchPolicy: 'network-only',
+  })
+
+  const wishlistIds = data?.wishlistProducts ?? []
+
+  products_data.value = products_data.value.map(product => ({
+    ...product,
+    is_favorite: wishlistIds.includes(product.id)
+  }))
+}
+
 const loadProducts = async () => {
   try {
     console.log(filters.value)
@@ -290,11 +344,13 @@ const loadProducts = async () => {
         limit: 9,
         category_slug: activeCategorySlug.value,
         filters: filters.value,
+        sort_by: sortBy.value,
       },
       fetchPolicy: 'network-only',
     })
 
     products_data.value = data?.products.data
+    await loadWishlistStatus()
     pagination.value = data?.products.pagination
 
     categories.value = data?.products.filters.categories
@@ -334,6 +390,7 @@ const loadProducts = async () => {
 watch(currentPage, () => {
   loadProducts()
 })
+
 onMounted(() => {
   loadProducts()
 })
@@ -344,6 +401,7 @@ watch(
       () => selected.value.brands,
       () => selected.value.values,
       () => route.query.category,
+      () => sortBy.value,
       currentPage
     ],
     async () => {
@@ -372,21 +430,49 @@ watch(
     },
     { deep: true }
 )
-watch(
-    () => selected.value.categories,
-    (val) => {
-      console.log('selected', val)
-    },
-    { deep: true }
-)
+
 const openBlocks = ref({
   categories: true,
   brands: true,
   values: true
 })
 
-const toggleFavorite = (product: any) => {
-  product.isFavorite = !product.isFavorite
+const toggleFavorite = async (product: any) => {
+  const token = localStorage.getItem('token')
+
+  if (!token) {
+    return
+  }
+
+  try {
+    const mutation = product.is_favorite
+        ? DELETE_WISHLIST
+        : ADD_WISHLIST
+
+    const { data } = await apolloClient.mutate({
+      mutation,
+      variables: {
+        id: product.id
+      },
+      context: {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    })
+
+    const response = product.is_favorite
+        ? data?.deleteWishList
+        : data?.addWishList
+
+    if (response.status) {
+      product.is_favorite = !product.is_favorite
+    }
+
+  } catch (error) {
+    console.error('Wishlist mutation error:', error)
+  }
 }
 
 const toggleBlock = (key: 'categories' | 'brands' | 'values') => {
@@ -661,6 +747,7 @@ const pageNumbers = computed(() => {
   cursor: pointer;
 
   transition: all 0.25s ease;
+  user-select: none;
 }
 
 .favorite:hover {
@@ -825,6 +912,20 @@ const pageNumbers = computed(() => {
 .category-parent * {
   user-select: none;
 }
+
+.color-value {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.color-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+  flex-shrink: 0;
+}
 @media (min-width: 2560px) {
   .products-page {
     max-width: 130rem;
@@ -909,6 +1010,20 @@ const pageNumbers = computed(() => {
   .category-parent,
   .category-parent * {
     user-select: none;
+  }
+
+  .color-value {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .color-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+    flex-shrink: 0;
   }
 }
 </style>
