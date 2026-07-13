@@ -1,12 +1,18 @@
 import { gql } from "@apollo/client/core";
 
 export const GET_PRODUCTS = gql`
-  query MyQuery($page: Int!, $limit: Int!, $category_slug: String) {
+  query MyQuery(
+    $page: Int!
+    $limit: Int!
+    $category_slug: String
+    $filters: [Filter]
+  ) {
     products(
       input: {
         page: $page
         limit: $limit
         category_slug: $category_slug
+        filters: $filters
       }
     ) {
       data {
@@ -52,14 +58,18 @@ export const GET_PRODUCTS = gql`
           }
         }
 
-        values {
-          active
+        characteristics {
           id
-          slug
           name
-          sort_order
+
+          values {
+            id
+            name
+            slug
+          }
         }
       }
+
       pagination {
         currentPage
         firstItem

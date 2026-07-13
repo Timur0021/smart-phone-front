@@ -88,25 +88,37 @@
           </div>
         </div>
 
-        <div class="filter-block">
-          <div class="filter-header" @click="toggleBlock('values')">
-            <h4>Значення</h4>
-            <span class="arrow" :class="{ open: openBlocks.values }"></span>
+        <div
+            v-for="characteristic in characteristics"
+            :key="characteristic.id"
+            class="filter-block"
+        >
+          <div
+              class="filter-header"
+              @click="toggleCharacteristic(characteristic.id)"
+          >
+            <h4>{{ characteristic.name }}</h4>
+
+            <span
+                class="arrow"
+                :class="{ open: openedCharacteristics[characteristic.id] }"
+            ></span>
           </div>
 
-          <div v-show="openBlocks.values">
-            <label v-for="val in visibleValues" :key="val.id" class="checkbox">
-              <input type="checkbox" v-model="selected.values" :value="val.id" />
-              <span>{{ val.name }}</span>
-            </label>
-
-            <div
-                v-if="values.length > 3"
-                class="show-more"
-                @click.stop="toggleShowAll('values')"
+          <div v-show="openedCharacteristics[characteristic.id]">
+            <label
+                v-for="value in characteristic.values"
+                :key="value.id"
+                class="checkbox"
             >
-              {{ showAll.values ? 'Сховати' : 'Показати ще' }}
-            </div>
+              <input
+                  type="checkbox"
+                  v-model="selected.values"
+                  :value="value.id"
+              />
+
+              <span>{{ value.name }}</span>
+            </label>
           </div>
         </div>
       </aside>
@@ -199,29 +211,85 @@
 import { onMounted, ref, computed, watch } from 'vue'
 import { apolloClient } from "@/graphql/apolloClient.ts";
 import { GET_PRODUCTS} from "@/graphql/queries/products/products.ts";
+import { useRoute, useRouter } from 'vue-router'
+
+const route = useRoute()
+const router = useRouter()
 
 const sortBy = ref('popular')
 const openedCategories = ref<Record<number, boolean>>({})
+const openedCharacteristics = ref<Record<number, boolean>>({})
 
 const products_data = ref([])
 const categories = ref([])
 const brands = ref([])
-const values = ref([])
+const characteristics = ref([])
 const currentPage = ref(1)
+
+const categoryInitialized = ref(false)
+const activeCategorySlug = computed(() => {
+  return selected.value.categories.length
+      ? null
+      : categorySlug.value
+})
+
+const selected = ref<{
+  categories: number[]
+  brands: number[]
+  values: number[]
+}>({
+  categories: [],
+  brands: [],
+  values: []
+})
+
 const pagination = ref({
   currentPage: 1,
   lastPage: 1,
   total: 0,
 })
 
+const categorySlug = computed(() => {
+  return route.query.category || null
+})
+
+const filters = computed(() => {
+  const result = []
+
+  if (selected.value.categories.length) {
+    result.push({
+      type: 'categories',
+      ids: selected.value.categories
+    })
+  }
+
+  if (selected.value.brands.length) {
+    result.push({
+      type: 'brands',
+      ids: selected.value.brands
+    })
+  }
+
+  if (selected.value.values.length) {
+    result.push({
+      type: 'values',
+      ids: selected.value.values
+    })
+  }
+
+  return result
+})
+
 const loadProducts = async () => {
   try {
+    console.log(filters.value)
     const { data } = await apolloClient.query({
       query: GET_PRODUCTS,
       variables: {
         page: currentPage.value,
         limit: 9,
-        category_slug: null,
+        category_slug: activeCategorySlug.value,
+        filters: filters.value,
       },
       fetchPolicy: 'network-only',
     })
@@ -231,7 +299,33 @@ const loadProducts = async () => {
 
     categories.value = data?.products.filters.categories
     brands.value = data?.products.filters.brands
-    values.value = data?.products.filters.values
+    characteristics.value = data?.products.filters.characteristics
+
+    if (
+        categorySlug.value &&
+        !categoryInitialized.value
+    ) {
+      categories.value.forEach((cat: any) => {
+
+        if (cat.slug === categorySlug.value) {
+          selected.value.categories = [cat.id]
+          openedCategories.value[cat.id] = true
+        }
+
+        cat.children?.forEach((child: any) => {
+          if (child.slug === categorySlug.value) {
+            selected.value.categories = [child.id]
+            openedCategories.value[cat.id] = true
+          }
+        })
+      })
+
+      categoryInitialized.value = true
+    }
+
+    openedCharacteristics.value = Object.fromEntries(
+        characteristics.value.map((item: any) => [item.id, true])
+    )
   } catch (error) {
     console.error(error)
   }
@@ -244,12 +338,47 @@ onMounted(() => {
   loadProducts()
 })
 
-const selected = ref({
-  categories: [],
-  brands: [],
-  values: []
-})
+watch(
+    [
+      () => selected.value.categories,
+      () => selected.value.brands,
+      () => selected.value.values,
+      () => route.query.category,
+      currentPage
+    ],
+    async () => {
+      await loadProducts()
+    },
+    { deep: true }
+)
 
+watch(
+    () => selected.value.categories,
+    async (categories) => {
+      if (
+          categories.length === 0 &&
+          route.query.category
+      ) {
+        await router.replace({
+          path: route.path,
+          query: {
+            ...route.query,
+            category: undefined
+          }
+        })
+
+        await loadProducts()
+      }
+    },
+    { deep: true }
+)
+watch(
+    () => selected.value.categories,
+    (val) => {
+      console.log('selected', val)
+    },
+    { deep: true }
+)
 const openBlocks = ref({
   categories: true,
   brands: true,
@@ -286,9 +415,9 @@ const visibleBrands = computed(() =>
     showAll.value.brands ? brands.value : brands.value.slice(0, 3)
 )
 
-const visibleValues = computed(() =>
-    showAll.value.values ? values.value : values.value.slice(0, 3)
-)
+const toggleCharacteristic = (id: number) => {
+  openedCharacteristics.value[id] = !openedCharacteristics.value[id]
+}
 
 const pageNumbers = computed(() => {
   const total = pagination.value.lastPage

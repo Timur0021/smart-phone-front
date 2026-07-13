@@ -207,12 +207,24 @@ async function loadSettings() {
       categories.value = (categoriesData || []).map((cat: any) => ({
         id: cat.id,
         name: cat.name,
-        link: `/${cat.slug}`,
+        slug: cat.slug,
+        link: {
+          path: '/products',
+          query: {
+            category: cat.slug
+          }
+        },
         will_be_soon: cat.will_be_soon || false,
         children: (cat.children || []).map((child: any) => ({
           id: child.id,
           name: child.name,
-          link: `/${cat.slug}/${child.slug}`
+          slug: child.slug,
+          link: {
+            path: '/products',
+            query: {
+              category: child.slug
+            }
+          }
         }))
       }))
     } else {
