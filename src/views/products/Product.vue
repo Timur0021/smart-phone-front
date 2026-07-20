@@ -63,10 +63,10 @@
 
             <div class="prices">
               <span class="old" v-if="product.old_price">
-                {{ product.old_price }} ₴
+                {{ totalOldPrice }} ₴
               </span>
 
-              <span class="current">{{ product.price }} ₴</span>
+              <span class="current">{{ totalPrice }} ₴</span>
             </div>
           </div>
 
@@ -428,6 +428,14 @@ const paginatedReviews = computed(() => {
 
 const totalPages = computed(() => {
   return Math.ceil(product.value.reviews.length / perPage);
+});
+
+const totalPrice = computed(() => {
+  return Number(product.value.price || 0) * quantity.value;
+});
+
+const totalOldPrice = computed(() => {
+  return Number(product.value.old_price || 0) * quantity.value;
 });
 
 const nextPage = () => {
