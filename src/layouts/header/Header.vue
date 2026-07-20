@@ -142,11 +142,6 @@
             Нічого не знайдено
           </div>
         </div>
-<!--        <div v-if="showPopup" class="search-popup">-->
-<!--          <div class="popup-title">Часто шукають</div>-->
-<!--          <div class="popup-item">Телефон</div>-->
-<!--          <div class="popup-item">Планшет</div>-->
-<!--        </div>-->
       </div>
 
       <div class="user-icons">

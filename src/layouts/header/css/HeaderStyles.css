@@ -205,10 +205,6 @@
 .third-nav .search-bar button { position: absolute; top: 0; right: 0; height: 100%; border: none; background: #2563eb; color: #fff; border-radius: 0 8px 8px 0; padding: 0 16px; cursor: pointer; font-weight: 700; font-size: 18px; line-height: 44px; transition: background 0.2s; }
 .third-nav .search-bar button:hover { background: #1e40af; }
 
-/*.search-popup { position: absolute; top: 110%; left: 0; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); padding: 24px 24px 20px; width: 95%; z-index: 30; }*/
-/*.search-popup .popup-title { color: #6b7280; font-weight: 700; font-size: 30px; margin-bottom: 20px; }*/
-/*.search-popup .popup-item { color: #000; font-size: 20px; margin-bottom: 25px; cursor: pointer; }*/
-/*.search-popup .popup-item:hover { color: #2563eb; }*/
 .search-item {
     display: flex;
     align-items: center;
