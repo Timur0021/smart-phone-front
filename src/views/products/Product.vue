@@ -267,7 +267,7 @@ const loadProductFeedbacks = async () => {
       },
       fetchPolicy: "network-only",
     });
-    console.log(data);
+
     product.value.reviews = data?.productFeedbacks?.data ?? []
   } catch (e: any) {
     console.error(e);
