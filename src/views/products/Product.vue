@@ -132,7 +132,7 @@
             >
               <div class="review-avatar">
                 <img
-                    :src="review.avatar || `https://ui-avatars.com/api/?name=${review.name}+${review.surname}&background=0D8ABC&color=fff`"
+                    :src="`https://ui-avatars.com/api/?name=${review.name}+${review.surname}&background=0D8ABC&color=fff`"
                     alt="avatar"
                 />
               </div>
