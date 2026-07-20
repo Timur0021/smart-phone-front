@@ -109,10 +109,44 @@
         <button @click="onSearch">Знайти</button>
 
         <div v-if="showPopup" class="search-popup">
-          <div class="popup-title">Часто шукають</div>
-          <div class="popup-item">Телефон</div>
-          <div class="popup-item">Планшет</div>
+          <div
+              v-for="product in searchResults"
+              :key="product.id"
+              class="search-item"
+          >
+            <img
+                :src="product.image"
+                :alt="product.name"
+                class="search-image"
+            />
+
+            <div class="search-info">
+              <div class="search-name">
+                {{ product.name }}
+              </div>
+
+              <div class="search-sku">
+                Артикул: {{ product.code }}
+              </div>
+            </div>
+
+            <div class="search-price">
+              {{ product.price }} ₴
+            </div>
+          </div>
+
+          <div
+              v-if="!searchResults.length"
+              class="search-empty"
+          >
+            Нічого не знайдено
+          </div>
         </div>
+<!--        <div v-if="showPopup" class="search-popup">-->
+<!--          <div class="popup-title">Часто шукають</div>-->
+<!--          <div class="popup-item">Телефон</div>-->
+<!--          <div class="popup-item">Планшет</div>-->
+<!--        </div>-->
       </div>
 
       <div class="user-icons">
@@ -156,6 +190,23 @@ const hoveredCategory = ref<number | null>(null)
 
 const showContactPopup = ref(false)
 const contactPhone = ref('')
+
+const searchResults = ref([
+  {
+    id: 1,
+    name: 'Apple iPhone 16 Pro Max 256GB Natural Titanium',
+    code: 'IP16PM256',
+    price: 64999,
+    image: 'https://placehold.co/100x100'
+  },
+  {
+    id: 2,
+    name: 'Samsung Galaxy S25 Ultra 512GB',
+    code: 'SGS25512',
+    price: 58999,
+    image: 'https://placehold.co/100x100'
+  }
+]);
 
 function openContactPopup() {
   showContactPopup.value = true
