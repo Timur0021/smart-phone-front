@@ -1,9 +1,13 @@
 <template>
-  <div class="product-page">
+  <div v-if="loading" class="page-loader">
+    <div class="loader"></div>
+  </div>
+
+  <div v-else class="product-page">
     <Breadcrumbs
         :items="[
           { name: 'Товари', link: '/products' },
-          { name: product.title, link: `/products/${product.slug}` }
+          { name: product.name, link: `/products/${product.slug}` }
         ]"
     />
 
@@ -18,12 +22,12 @@
                 :class="{ active: img === activeImage }"
                 @click="setImage(img)"
             >
-              <img :src="img" />
+              <img :src="img" alt="Фото"/>
             </div>
           </div>
 
           <div class="main-image">
-            <img :src="activeImage" alt="product" />
+            <img :src="activeImage" alt="product"/>
           </div>
         </div>
 
@@ -33,13 +37,13 @@
               Код: {{ product.code }}
             </div>
 
-            <div class="availability" v-if="product.inStock">
+            <div class="availability" v-if="product.in_stock">
               <span class="dot"></span>
               <span>В наявності</span>
             </div>
           </div>
 
-          <h1 class="title">{{ product.title }}</h1>
+          <h1 class="title">{{ product.name }}</h1>
 
           <div class="divider"></div>
 
@@ -58,8 +62,8 @@
             </div>
 
             <div class="prices">
-              <span class="old" v-if="product.oldPrice">
-                {{ product.oldPrice }} ₴
+              <span class="old" v-if="product.old_price">
+                {{ product.old_price }} ₴
               </span>
 
               <span class="current">{{ product.price }} ₴</span>
@@ -75,9 +79,9 @@
               <button class="buy-btn info" @click="openReviewModal">Залишити відгук</button>
             </div>
 
-            <button class="favorite-btn" @click="toggleFavorite">
+            <button v-if="isAuthenticated" class="favorite-btn" @click="toggleFavorite">
                 <span>
-                  {{ isFavorite ? '❤️' : '♡' }}
+                  {{ product.is_favorite ? '❤️' : '♡' }}
                 </span>
             </button>
           </div>
@@ -87,9 +91,7 @@
       <div class="description-box">
         <h2 class="description-title">Опис</h2>
 
-        <p class="description">
-          {{ product.description }}
-        </p>
+        <div class="description" v-html="product.description"></div>
       </div>
 
       <div class="tabs">
@@ -129,7 +131,7 @@
                 :key="index"
             >
               <div class="review-avatar">
-                <img :src="review.avatar" alt="avatar" />
+                <img  :src="review.avatar || 'https://ui-avatars.com/api/?name=User&background=random'" alt="avatar"/>
               </div>
 
               <div class="review-body">
@@ -143,6 +145,7 @@
                         v-for="(star, i) in getStars(review.rating)"
                         :key="i"
                         class="star"
+                        :class="star"
                     >
                       ★
                     </span>
@@ -150,7 +153,7 @@
                 </div>
 
                 <p class="review-text">
-                  {{ review.text }}
+                  {{ review.content }}
                 </p>
               </div>
             </div>
@@ -178,8 +181,20 @@
 
       <h2>Залишити відгук</h2>
 
-      <div class="form-group">
-        <input v-model="reviewForm.fullName" placeholder="Ім'я та прізвище" />
+      <div class="form-row">
+        <div class="form-group">
+          <input
+              v-model="reviewForm.name"
+              placeholder="Ім'я"
+          />
+        </div>
+
+        <div class="form-group">
+          <input
+              v-model="reviewForm.surname"
+              placeholder="Прізвище"
+          />
+        </div>
       </div>
 
       <div class="form-group">
@@ -207,122 +222,122 @@
           Відправити
         </button>
       </div>
-
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from "vue";
+import {ref, onMounted, computed, watch} from "vue";
 import StarRatings from "vue3-star-ratings";
 import Breadcrumbs from "@/views/Breadcrumbs.vue";
+import { useRoute } from "vue-router";
+import { apolloClient } from "@/graphql/apolloClient";
+import { GET_PRODUCT } from "@/graphql/queries/products/product";
+import { GET_WISHLIST_STATUS } from "@/graphql/queries/products/wishlistProductIds.ts";
+import { ADD_WISHLIST } from "@/graphql/mutations/products/addWishlist.ts";
+import { DELETE_WISHLIST } from "@/graphql/mutations/products/deleteWishlist.ts";
+import { CREATE_PRODUCT_FEEDBACK } from "@/graphql/mutations/products/productFeedback";
+import { GET_PRODUCT_FEEDBACKS } from "@/graphql/queries/products/productFeedbacks.ts";
+import { useToast } from "vue-toastification";
 
-const product = ref({
-  title: "iPhone 15 Pro Max 256GB",
-  slug: "iphone-15-pro-max-256gb",
-  code: "IP15PM-256",
-  inStock: true,
-  price: 58999,
-  oldPrice: 69999,
-  quantity: 50,
-  description:
-      "iPhone 15 Pro Max 256GB — це флагманський смартфон від Apple, який поєднує в собі преміальний дизайн, високу продуктивність, передові камери та великий, якісний дисплей. Він створений для користувачів, які очікують максимум можливостей від мобільного пристрою — як у повсякденному використанні, так і в професійних задачах." +
-      "\n" +
-      "Корпус пристрою виготовлений з титану, що робить його значно міцнішим і водночас легшим у порівнянні з попередніми моделями. Завдяки цьому смартфон зручно лежить у руці та має більш витончений і сучасний вигляд. Закруглені краї та мінімалістичний дизайн підкреслюють преміальний характер пристрою." +
-      "\n" +
-      "Дисплей Super Retina XDR з діагоналлю 6.7 дюйма забезпечує надзвичайно чітке та яскраве зображення. Підтримка ProMotion з частотою оновлення до 120 Гц гарантує плавну анімацію, швидку реакцію інтерфейсу та комфорт під час перегляду контенту, ігор або роботи з додатками. Екран відзначається високою яскравістю, точною передачею кольорів і глибоким чорним кольором.",
-  images: [
-    "https://picsum.photos/id/1015/1200/800",
-    "https://picsum.photos/id/1016/1200/800",
-    "https://picsum.photos/id/1018/1200/800",
-    "https://picsum.photos/id/1020/1200/800",
-    "https://picsum.photos/id/1024/1200/800",
-    "https://picsum.photos/id/1027/1200/800",
-    "https://picsum.photos/id/1035/1200/800"
-  ],
-  characteristics: [
-    { name: "Бренд", value: "Apple" },
-    { name: "Памʼять", value: "256 GB" },
-    { name: "Колір", value: "Titanium Black" },
-    { name: "Екран", value: "6.7 OLED" },
-  ],
-  reviews: [
-    {
-      name: "Іван",
-      surname: "Петренко",
-      rating: 5,
-      text: "Дуже крутий товар 🔥",
-      avatar: "https://i.pravatar.cc/100?img=12"
-    },
-    {
-      name: "Олена",
-      surname: "Коваль",
-      rating: 4,
-      text: "Камера просто топ! Я був приємно здивований якістю фото навіть у складних умовах освітлення. Знімки виходять дуже чіткі, з правильними кольорами та чудовою деталізацією. Особливо сподобалось, як працює нічний режим — фотографії виглядають так, ніби зроблені професійною камерою. Відео також на високому рівні: стабілізація працює ідеально, немає тряски навіть під час руху. В цілому, це один із найкращих смартфонів, які я використовував, і камера тут реально одна з головних причин для покупки.",
-      avatar: "https://i.pravatar.cc/100?img=32"
-    },
-    {
-      name: "Андрій",
-      surname: "Мельник",
-      rating: 5,
-      text: "Телефон перевершив усі очікування. Дуже швидкий, нічого не зависає навіть при великому навантаженні. Камера реально топ — користуюсь кожного дня і завжди отримую класні фото. Батарея тримає довго, що для мене дуже важливо. Однозначно рекомендую!",
-      avatar: "https://i.pravatar.cc/100?img=21"
-    },
-    {
-      name: "Марія",
-      surname: "Шевченко",
-      rating: 5,
-      text: "Дуже стильний дизайн і приємно лежить у руці. Екран яскравий і плавний, користуватись одне задоволення. Особливо подобається якість відео — знімаю блоги і різниця з попереднім телефоном колосальна.",
-      avatar: "https://i.pravatar.cc/100?img=45"
-    },
-    {
-      name: "Олександр",
-      surname: "Кравець",
-      rating: 4,
-      text: "Загалом дуже хороший смартфон. Потужний процесор, швидка робота системи, якісні матеріали. Єдине — ціна трохи висока, але воно того варте.",
-      avatar: "https://i.pravatar.cc/100?img=33"
-    },
-    {
-      name: "Ірина",
-      surname: "Ткаченко",
-      rating: 5,
-      text: "Користуюсь вже місяць і дуже задоволена. Особливо подобається камера — фото виходять як з професійної камери. Також сподобалась автономність, заряд тримає цілий день без проблем.",
-      avatar: "https://i.pravatar.cc/100?img=28"
-    },
-    {
-      name: "Дмитро",
-      surname: "Сидоренко",
-      rating: 4,
-      text: "Дуже швидкий телефон, все працює без лагів. Ігри йдуть ідеально. Камера хороша, але очікував трохи більшого нічного режиму. В цілому задоволений покупкою.",
-      avatar: "https://i.pravatar.cc/100?img=14"
-    },
-    {
-      name: "Наталія",
-      surname: "Гончар",
-      rating: 5,
-      text: "Це найкращий телефон, який у мене був. Дуже гарний дисплей, плавна анімація, зручний інтерфейс. Камера — просто космос, особливо портретний режим.",
-      avatar: "https://i.pravatar.cc/100?img=47"
-    },
-    {
-      name: "Віталій",
-      surname: "Бондаренко",
-      rating: 4,
-      text: "Хороший апарат для роботи і розваг. Використовую для фото, відео та роботи — справляється з усім. Трохи дорогий, але якість відповідає ціні.",
-      avatar: "https://i.pravatar.cc/100?img=19"
-    },
-    {
-      name: "Світлана",
-      surname: "Клименко",
-      rating: 5,
-      text: "Дуже задоволена покупкою. Камера, швидкість, дизайн — все на найвищому рівні. Особливо сподобалась стабілізація відео — знімаю дітей і все виходить дуже плавно.",
-      avatar: "https://i.pravatar.cc/100?img=50"
+
+const toast = useToast();
+const route = useRoute();
+
+const product = ref<any>({
+  images: [],
+  reviews: [],
+  characteristics: [],
+  is_favorite: false,
+});
+const activeImage = ref('');
+const loading = ref(true);
+
+const loadProductFeedbacks = async () => {
+  try {
+    const { data } = await apolloClient.query({
+      query: GET_PRODUCT_FEEDBACKS,
+      variables: {
+        id: product.value.id,
+        page: currentPage.value,
+        limit: 10,
+      },
+      fetchPolicy: "network-only",
+    });
+    console.log(data);
+    product.value.reviews = data?.productFeedbacks?.data ?? []
+  } catch (e: any) {
+    console.error(e);
+  }
+}
+
+const loadProduct = async () => {
+  try {
+    loading.value = true;
+
+    const { data } = await apolloClient.query({
+      query: GET_PRODUCT,
+      variables: {
+        slug: route.params.slug
+      },
+      errorPolicy: 'all'
+    });
+
+    product.value = {
+      ...data?.product,
+      is_favorite: false,
+    };
+
+    await loadWishlistStatus();
+    await loadProductFeedbacks();
+
+    if (product.value.images?.length) {
+      activeImage.value = product.value.images[0];
     }
-  ],
+  } catch (e) {
+    console.log(e);
+  } finally {
+    loading.value = false;
+  }
+}
+
+const loadWishlistStatus = async () => {
+  const token = localStorage.getItem('token');
+
+  if (!token || !product.value?.id) {
+    return;
+  }
+
+  const { data } = await apolloClient.query({
+    query: GET_WISHLIST_STATUS,
+    variables: {
+      ids: [product.value.id]
+    },
+    context: {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+    fetchPolicy: 'network-only',
+  });
+
+  const wishlistIds = data?.wishlistProducts ?? [];
+
+  product.value.is_favorite = wishlistIds.includes(product.value.id);
+};
+
+onMounted(async () => {
+  await loadProduct();
+});
+
+const isAuthenticated = computed(() => {
+  return !!localStorage.getItem('token');
 });
 
 const showReviewModal = ref(false);
 const reviewForm = ref({
-  fullName: "",
+  name: "",
+  surname: "",
   rating: 0,
   text: ""
 });
@@ -335,26 +350,69 @@ const closeReviewModal = () => {
   showReviewModal.value = false;
 };
 
-const submitReview = () => {
-  console.log("Review:", reviewForm.value);
+const submitReview = async () => {
+  if (!reviewForm.value.name.trim()) {
+    toast.error("Please enter your name");
+    return;
+  }
 
-  closeReviewModal();
+  if (!reviewForm.value.rating) {
+    toast.error("Please select a rating");
+    return;
+  }
 
-  reviewForm.value = {
-    fullName: "",
-    rating: 0,
-    text: ""
-  };
+  try {
+    const { data } = await apolloClient.mutate({
+      mutation: CREATE_PRODUCT_FEEDBACK,
+      variables: {
+        name: reviewForm.value.name,
+        surname: reviewForm.value.surname,
+        content: reviewForm.value.text,
+        product_id: product.value.id,
+        rating: Math.round(reviewForm.value.rating * 2) / 2,
+      },
+    });
+
+    if (data?.createProductFeedback?.status) {
+      toast.success(
+          data.createProductFeedback.message ?? "Відгук успішно додано"
+      );
+
+      reviewForm.value = {
+        name: "",
+        surname: "",
+        rating: 0,
+        text: "",
+      };
+
+      closeReviewModal();
+
+      await loadProduct();
+    }
+  } catch (e: any) {
+    toast.error(e.message ?? "Помилка при відправці відгуку");
+    console.log(e);
+  }
 };
-
-const activeImage = ref(product.value.images[0]);
 
 const setImage = (img: string) => {
   activeImage.value = img;
 };
 
 const getStars = (rating: number) => {
-  return Array.from({ length: 5 }, (_, i) => i < rating);
+  return Array.from({ length: 5 }, (_, i) => {
+    const starNumber = i + 1;
+
+    if (rating >= starNumber) {
+      return "full";
+    }
+
+    if (rating >= starNumber - 0.5) {
+      return "half";
+    }
+
+    return "empty";
+  });
 };
 
 const currentPage = ref(1);
@@ -404,10 +462,40 @@ watch(quantity, (val) => {
 
 const activeTab = ref<"chars" | "reviews">("chars");
 
-const isFavorite = ref(false);
+const toggleFavorite = async () => {
+  const token = localStorage.getItem('token');
 
-const toggleFavorite = () => {
-  isFavorite.value = !isFavorite.value;
+  if (!token) {
+    return;
+  }
+
+  try {
+    const mutation = product.value.is_favorite
+        ? DELETE_WISHLIST
+        : ADD_WISHLIST;
+
+    const { data } = await apolloClient.mutate({
+      mutation,
+      variables: {
+        id: product.value.id,
+      },
+      context: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    });
+
+    const response = product.value.is_favorite
+        ? data?.deleteWishList
+        : data?.addWishList;
+
+    if (response?.status) {
+      product.value.is_favorite = !product.value.is_favorite;
+    }
+  } catch (e) {
+    console.error(e);
+  }
 };
 </script>
 
@@ -692,6 +780,7 @@ const toggleFavorite = () => {
   background: #14b8a6;
   color: #fff;
 }
+
 .buy-btn.info:hover {
   background: #0f766e;
 }
@@ -896,6 +985,24 @@ const toggleFavorite = () => {
   font-size: 26px;
 }
 
+.star.empty {
+  color: #d1d5db;
+}
+
+.star.full {
+  color: #f5b301;
+}
+
+.star.half {
+  background: linear-gradient(
+      90deg,
+      #f5b301 50%,
+      #d1d5db 50%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .review-text {
   margin: 0;
   color: #444;
@@ -931,6 +1038,33 @@ const toggleFavorite = () => {
   font-size: 18px;
   font-weight: 600;
 }
+
+.page-loader {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,.9);
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.loader {
+  width: 70px;
+  height: 70px;
+  border: 6px solid #dbeafe;
+  border-top: 6px solid #2563eb;
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (min-width: 2560px) {
   .gallery {
     margin-left: 2rem
@@ -977,7 +1111,7 @@ const toggleFavorite = () => {
   .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -990,7 +1124,7 @@ const toggleFavorite = () => {
     background: #fff;
     border-radius: 16px;
     padding: 30px 40px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     position: relative;
   }
 
@@ -1027,6 +1161,17 @@ const toggleFavorite = () => {
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 15px;
+  }
+
+  .form-row .form-group {
+    flex: 1;
+    margin-bottom: 0;
   }
 
   textarea {

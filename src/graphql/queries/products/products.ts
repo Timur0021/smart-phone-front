@@ -28,6 +28,10 @@ export const GET_PRODUCTS = gql`
         price
         quantity
         slug
+        short_description
+        description
+        code
+        in_stock
         views_count
         image
         is_favorite

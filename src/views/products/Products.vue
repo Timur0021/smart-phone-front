@@ -1,5 +1,9 @@
 <template>
   <section class="products-page">
+    <div v-if="loading" class="page-loader">
+      <div class="spinner"></div>
+    </div>
+
     <nav class="breadcrumbs">
       <router-link to="/" class="crumb">Головна</router-link>
       <span class="separator">/</span>
@@ -147,6 +151,7 @@
         <div class="grid">
           <div v-for="product in products_data" :key="product.id" class="card">
             <div
+                v-if="isAuthenticated"
                 class="favorite"
                 @click="toggleFavorite(product)"
             >
@@ -157,7 +162,7 @@
             <img :src="product.image" class="image"  alt="image"/>
 
             <div class="reviews">
-              ⭐ {{ product.views_count ?? 0 }} відгуків
+              ⭐ {{ product.views_count ?? 0 }} переглядів
             </div>
 
             <router-link
@@ -225,6 +230,7 @@ import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
 
+const loading = ref(false)
 const getColor = (name: string) => {
   const map: Record<string, string> = {
     чорний: 'black',
@@ -335,6 +341,8 @@ const loadWishlistStatus = async () => {
 }
 
 const loadProducts = async () => {
+  loading.value = true
+
   try {
     console.log(filters.value)
     const { data } = await apolloClient.query({
@@ -384,6 +392,8 @@ const loadProducts = async () => {
     )
   } catch (error) {
     console.error(error)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -425,7 +435,7 @@ watch(
           }
         })
 
-        await loadProducts()
+        window.location.reload()
       }
     },
     { deep: true }
@@ -504,6 +514,10 @@ const visibleBrands = computed(() =>
 const toggleCharacteristic = (id: number) => {
   openedCharacteristics.value[id] = !openedCharacteristics.value[id]
 }
+
+const isAuthenticated = computed(() => {
+  return !!localStorage.getItem('token');
+});
 
 const pageNumbers = computed(() => {
   const total = pagination.value.lastPage
@@ -925,6 +939,41 @@ const pageNumbers = computed(() => {
   border-radius: 4px;
   border: 1px solid #d1d5db;
   flex-shrink: 0;
+}
+
+.page-loader {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.7);
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 99999;
+  backdrop-filter: blur(2px);
+}
+
+.spinner {
+  width: 80px;
+  height: 80px;
+
+  border: 8px solid #dbeafe;
+  border-top: 8px solid #007bff;
+
+  border-radius: 50%;
+
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 @media (min-width: 2560px) {
   .products-page {

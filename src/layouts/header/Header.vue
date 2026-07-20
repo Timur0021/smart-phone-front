@@ -119,7 +119,7 @@
         <button @click="goToDashboard">
           <i class="fa-solid fa-user" style="color: #000000;"></i>
         </button>
-        <button>❤️</button>
+        <button v-if="isAuthenticated">❤️</button>
         <button>🛒</button>
       </div>
     </nav>
@@ -243,6 +243,10 @@ async function loadSettings() {
     console.error('GraphQL error:', error)
   }
 }
+
+const isAuthenticated = computed(() => {
+  return !!localStorage.getItem('token');
+});
 
 onMounted(() => {
   const savedLang = localStorage.getItem('siteLang') as 'UA' | 'EN' | null

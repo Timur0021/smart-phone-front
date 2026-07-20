@@ -6,6 +6,12 @@ export const GET_PRODUCT = gql`
       id
       name
       slug
+      short_description
+      description
+      code
+      in_stock
+      image
+      images
       quantity
       price
       old_price
@@ -58,6 +64,10 @@ export const GET_PRODUCT = gql`
           show_in_filter
           show_in_product
         }
+      }
+      characteristics {
+        name
+        value
       }
     }
   }
