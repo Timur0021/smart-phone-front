@@ -105,13 +105,19 @@
       </div>
 
       <div class="search-bar">
-        <input type="text" v-model="searchQuery" placeholder="Пошук..." @focus="showPopup = true" @blur="hidePopup" />
-        <button @click="onSearch">Знайти</button>
+        <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="Пошук..."
+            @focus="openSearchPopup"
+            @blur="hidePopup"
+        />
 
         <div v-if="showPopup" class="search-popup">
-          <div
+          <RouterLink
               v-for="product in searchResults"
               :key="product.id"
+              :to="`/product/${product.slug}`"
               class="search-item"
           >
             <img
@@ -130,13 +136,26 @@
               </div>
             </div>
 
-            <div class="search-price">
-              {{ product.price }} ₴
+            <div class="search-prices">
+              <span
+                  v-if="product.old_price && product.old_price > product.price"
+                  class="search-old-price"
+              >
+                {{ product.old_price }} ₴
+              </span>
+
+                          <span class="search-current-price">
+                {{ product.price }} ₴
+              </span>
             </div>
+          </RouterLink>
+
+          <div v-if="searchLoading">
+            Завантаження...
           </div>
 
           <div
-              v-if="!searchResults.length"
+              v-else-if="!searchResults.length"
               class="search-empty"
           >
             Нічого не знайдено
@@ -161,6 +180,7 @@ import { RouterLink, useRouter } from 'vue-router'
 import { apolloClient } from "@/graphql/apolloClient.ts";
 import { GET_SETTINGS } from "@/graphql/queries/settings/settings.ts";
 import { CREATE_REQUEST } from "@/graphql/mutations/request/request.ts";
+import { SEARCH } from "@/graphql/queries/products/search.ts";
 import { useToast } from "vue-toastification";
 
 const toast = useToast();
@@ -186,22 +206,47 @@ const hoveredCategory = ref<number | null>(null)
 const showContactPopup = ref(false)
 const contactPhone = ref('')
 
-const searchResults = ref([
-  {
-    id: 1,
-    name: 'Apple iPhone 16 Pro Max 256GB Natural Titanium',
-    code: 'IP16PM256',
-    price: 64999,
-    image: 'https://placehold.co/100x100'
-  },
-  {
-    id: 2,
-    name: 'Samsung Galaxy S25 Ultra 512GB',
-    code: 'SGS25512',
-    price: 58999,
-    image: 'https://placehold.co/100x100'
+const searchResults = ref([]);
+const searchLoading = ref(false);
+const openSearchPopup = () => {
+  showPopup.value = true;
+
+  if (!searchResults.value.length) {
+    searchProducts();
   }
-]);
+};
+
+const searchProducts = async () => {
+  try {
+    searchLoading.value = true;
+
+    const { data } = await apolloClient.query({
+      query: SEARCH,
+      variables: {
+        search: searchQuery.value,
+        limit: 4,
+      },
+      fetchPolicy: "no-cache",
+    });
+
+    searchResults.value = data?.search ?? [];
+  } catch (e: any) {
+    console.error(e);
+    searchResults.value = [];
+  } finally {
+    searchLoading.value = false;
+  }
+}
+
+let searchTimeout: number;
+
+vueWatch(searchQuery, () => {
+  clearTimeout(searchTimeout);
+
+  searchTimeout = window.setTimeout(() => {
+    searchProducts();
+  }, 500);
+});
 
 function openContactPopup() {
   showContactPopup.value = true

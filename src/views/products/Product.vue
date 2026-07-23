@@ -75,7 +75,7 @@
           <div class="actions">
             <div class="left-actions">
               <button class="buy-btn primary">В кошик</button>
-              <button class="buy-btn secondary">Усі товари бренду</button>
+              <button class="buy-btn secondary" @click="goToBrandProducts">Усі товари бренду</button>
               <button class="buy-btn info" @click="openReviewModal">Залишити відгук</button>
             </div>
 
@@ -230,10 +230,10 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted, computed, watch} from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import StarRatings from "vue3-star-ratings";
 import Breadcrumbs from "@/views/Breadcrumbs.vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { apolloClient } from "@/graphql/apolloClient";
 import { GET_PRODUCT } from "@/graphql/queries/products/product";
 import { GET_WISHLIST_STATUS } from "@/graphql/queries/products/wishlistProductIds.ts";
@@ -245,6 +245,8 @@ import { useToast } from "vue-toastification";
 
 
 const toast = useToast();
+
+const router = useRouter();
 const route = useRoute();
 
 const product = ref<any>({
@@ -253,6 +255,7 @@ const product = ref<any>({
   characteristics: [],
   is_favorite: false,
 });
+
 const activeImage = ref('');
 const loading = ref(true);
 
@@ -347,6 +350,15 @@ const reviewForm = ref({
 
 const openReviewModal = () => {
   showReviewModal.value = true;
+};
+
+const goToBrandProducts = () => {
+  router.push({
+    path: "/products",
+    query: {
+      brand: product.value.brand.id
+    }
+  })
 };
 
 const closeReviewModal = () => {
@@ -470,6 +482,13 @@ watch(quantity, (val) => {
     quantity.value = 1;
   }
 });
+
+watch(
+    () => route.params.slug,
+    async () => {
+      await loadProduct()
+    }
+)
 
 const activeTab = ref<"chars" | "reviews">("chars");
 

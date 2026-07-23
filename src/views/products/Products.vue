@@ -162,7 +162,7 @@
             <img :src="product.image" class="image"  alt="image"/>
 
             <div class="reviews">
-              ⭐ {{ product.views_count ?? 0 }} переглядів
+              ⭐ {{ product.product_feedbacks_count ?? 0 }} відгуків
             </div>
 
             <router-link
@@ -282,6 +282,12 @@ const categorySlug = computed(() => {
   return route.query.category || null
 })
 
+const brandInitialized = ref(false)
+
+const brandId = computed(() => {
+  return route.query.brand || null
+})
+
 const filters = computed(() => {
   const result = []
 
@@ -387,6 +393,20 @@ const loadProducts = async () => {
       categoryInitialized.value = true
     }
 
+    if (
+        brandId.value &&
+        !brandInitialized.value
+    ) {
+      const brand = brands.value.find(
+          (item: any) => item.id === Number(brandId.value)
+      )
+
+      if (brand) {
+        selected.value.brands = [brand.id]
+        brandInitialized.value = true
+      }
+    }
+
     openedCharacteristics.value = Object.fromEntries(
         characteristics.value.map((item: any) => [item.id, true])
     )
@@ -436,6 +456,25 @@ watch(
         })
 
         window.location.reload()
+      }
+    },
+    { deep: true }
+)
+
+watch(
+    () => selected.value.brands,
+    async (brands) => {
+      if (
+          brands.length === 0 &&
+          route.query.brand
+      ) {
+        await router.replace({
+          path: route.path,
+          query: {
+            ...route.query,
+            brand: undefined
+          }
+        })
       }
     },
     { deep: true }

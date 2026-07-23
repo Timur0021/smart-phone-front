@@ -262,6 +262,29 @@
     text-align: right;
 }
 
+.search-prices {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    min-width: 120px;
+}
+
+.search-old-price {
+    font-size: 15px;
+    color: #9ca3af;
+    text-decoration: line-through;
+    font-weight: 500;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.search-current-price {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2563eb;
+    line-height: 1;
+}
+
 .search-popup {
     position: absolute;
     top: 110%;
@@ -294,6 +317,14 @@
     font-weight: 700;
     color: #2563eb;
     cursor: pointer;
+}
+
+.search-item,
+.search-name,
+.search-sku,
+.search-current-price,
+.search-old-price {
+    text-decoration: none;
 }
 
 .third-nav .user-icons { display: flex; gap: 12px; }

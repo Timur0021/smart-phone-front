@@ -20,6 +20,7 @@ export const GET_PRODUCT = gql`
       active
       meta_title
       meta_description
+      product_feedbacks_count
       brand {
         id
         name

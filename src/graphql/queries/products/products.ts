@@ -35,6 +35,7 @@ export const GET_PRODUCTS = gql`
         views_count
         image
         is_favorite
+        product_feedbacks_count
       }
 
       filters {
