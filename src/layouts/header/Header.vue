@@ -168,7 +168,13 @@
           <i class="fa-solid fa-user" style="color: #000000;"></i>
         </button>
         <button v-if="isAuthenticated">❤️</button>
-        <button>🛒</button>
+
+        <RouterLink
+            :to="{ name: 'basket' }"
+            class="basket-btn"
+        >
+          🛒
+        </RouterLink>
       </div>
     </nav>
   </header>

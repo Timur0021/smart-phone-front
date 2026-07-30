@@ -66,6 +66,11 @@ const routes = [
         name: 'product',
         component: () => import('../views/products/Product.vue'),
     },
+    {
+        path: '/:lang(en)?/basket',
+        name: 'basket',
+        component: () => import('../views/orders/Basket.vue'),
+    },
 ]
 
 const router = createRouter({

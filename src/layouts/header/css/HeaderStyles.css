@@ -330,6 +330,26 @@
 .third-nav .user-icons { display: flex; gap: 12px; }
 .third-nav .user-icons button { background: #e0e7ff; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 20px; font-weight: 700; color: #1e40af; display: flex; justify-content: center; align-items: center; transition: background 0.2s; }
 .third-nav .user-icons button:hover { background: #c7d2fe; }
+.basket-btn {
+    background: #e0e7ff;
+    border: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e40af;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.basket-btn:hover {
+    background: #c7d2fe;
+}
 
 @media (min-width: 2560px) {
   .nav-left { margin-left: 350px; }
