@@ -32,24 +32,57 @@
             </button>
           </div>
         </div>
+        <div class="sidebar">
+          <div class="promo-card">
+            <h3>Промокод</h3>
 
-        <aside class="order-summary">
-          <h2>Ваше замовлення</h2>
+            <div class="promo-input">
+              <input
+                  type="text"
+                  placeholder="Введіть промокод"
+              />
 
-          <div class="summary-row">
-            <span>Товарів</span>
-            <span>{{ totalItems }}</span>
+              <button class="promo-btn">
+                OK
+              </button>
+            </div>
           </div>
 
-          <div class="summary-row total">
-            <span>До сплати</span>
-            <span>{{ totalPrice }} ₴</span>
-          </div>
+          <aside class="order-summary">
+            <h2>Ваше замовлення</h2>
 
-          <button class="checkout-btn">
-            Оформити замовлення
-          </button>
-        </aside>
+            <div class="summary-row">
+              <span>Товарів</span>
+              <span>{{ totalItems }}</span>
+            </div>
+
+            <div class="summary-row total">
+              <span>До сплати</span>
+              <span>{{ totalPrice }} ₴</span>
+            </div>
+
+            <button class="checkout-btn">
+              Оформити замовлення
+            </button>
+          </aside>
+        </div>
+<!--        <aside class="order-summary">-->
+<!--          <h2>Ваше замовлення</h2>-->
+
+<!--          <div class="summary-row">-->
+<!--            <span>Товарів</span>-->
+<!--            <span>{{ totalItems }}</span>-->
+<!--          </div>-->
+
+<!--          <div class="summary-row total">-->
+<!--            <span>До сплати</span>-->
+<!--            <span>{{ totalPrice }} ₴</span>-->
+<!--          </div>-->
+
+<!--          <button class="checkout-btn">-->
+<!--            Оформити замовлення-->
+<!--          </button>-->
+<!--        </aside>-->
       </div>
     </div>
   </section>
@@ -100,6 +133,10 @@ const totalPrice = computed(() =>
 </script>
 
 <style scoped>
+* {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
 .basket-page {
   min-height: 100vh;
   padding: 50px 0;
@@ -122,6 +159,7 @@ const totalPrice = computed(() =>
   display: grid;
   grid-template-columns: 1fr 400px;
   gap: 30px;
+  align-items: start;
 }
 
 .basket-items {
@@ -225,6 +263,62 @@ const totalPrice = computed(() =>
 .remove-btn:hover {
   background: #dc2626;
   color: white;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.promo-card {
+  background: white;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(15,23,42,.06);
+}
+
+.promo-card h3 {
+  margin: 0 0 15px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.promo-input {
+  display: flex;
+  gap: 10px;
+}
+
+.promo-input input {
+  flex: 1;
+  height: 52px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 0 16px;
+  font-size: 15px;
+  outline: none;
+  transition: .2s;
+}
+
+.promo-input input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37,99,235,.1);
+}
+
+.promo-btn {
+  width: 70px;
+  border: none;
+  border-radius: 14px;
+  background: #2563eb;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.promo-btn:hover {
+  background: #1d4ed8;
 }
 
 .order-summary {
