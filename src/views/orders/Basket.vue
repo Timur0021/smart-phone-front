@@ -66,23 +66,6 @@
             </button>
           </aside>
         </div>
-<!--        <aside class="order-summary">-->
-<!--          <h2>Ваше замовлення</h2>-->
-
-<!--          <div class="summary-row">-->
-<!--            <span>Товарів</span>-->
-<!--            <span>{{ totalItems }}</span>-->
-<!--          </div>-->
-
-<!--          <div class="summary-row total">-->
-<!--            <span>До сплати</span>-->
-<!--            <span>{{ totalPrice }} ₴</span>-->
-<!--          </div>-->
-
-<!--          <button class="checkout-btn">-->
-<!--            Оформити замовлення-->
-<!--          </button>-->
-<!--        </aside>-->
       </div>
     </div>
   </section>
